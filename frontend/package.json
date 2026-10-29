@@ -1,0 +1,57 @@
+{
+  "name": "folio-ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --base=/assets/folio/frontend/",
+    "test": "vitest run",
+    "e2e": "mkdir -p e2e/shots && node e2e/smoke.mjs e2e/shots"
+  },
+  "dependencies": {
+    "@floating-ui/dom": "^1.6.0",
+    "@tiptap/core": "^3.26.0",
+    "@tiptap/extension-code-block": "^3.26.0",
+    "@tiptap/extension-code-block-lowlight": "^3.26.0",
+    "@tiptap/extension-collaboration": "^3.26.0",
+    "@tiptap/extension-drag-handle": "^3.26.0",
+    "@tiptap/extension-drag-handle-vue-3": "^3.26.0",
+    "@tiptap/extension-highlight": "^3.26.0",
+    "@tiptap/extension-image": "^3.26.0",
+    "@tiptap/extension-list": "^3.26.0",
+    "@tiptap/extension-mention": "^3.26.0",
+    "@tiptap/extension-node-range": "^3.26.0",
+    "@tiptap/extension-table": "^3.26.0",
+    "@tiptap/extension-typography": "^3.26.0",
+    "@tiptap/extensions": "^3.26.0",
+    "@tiptap/pm": "^3.26.0",
+    "@tiptap/starter-kit": "^3.26.0",
+    "@tiptap/suggestion": "^3.26.0",
+    "@tiptap/vue-3": "^3.26.0",
+    "@tiptap/y-tiptap": "^3.0.7",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "frappe-ui": "1.0.0-beta.29",
+    "highlight.js": "^11",
+    "lowlight": "^3.3.0",
+    "socket.io-client": "^4.7.2",
+    "tippy.js": "^6.3.7",
+    "vite": "^5.4.21",
+    "vue": "^3.5.13",
+    "vue-router": "^4.2.2",
+    "y-protocols": "^1.0.6",
+    "yjs": "^13.6.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "happy-dom": "^20.9.0",
+    "postcss": "^8.4.5",
+    "puppeteer-core": "^23",
+    "tailwindcss": "^3.4.15",
+    "vitest": "^3.2.4"
+  },
+  "resolutions": {
+    "prosemirror-model": "1.25.12",
+    "prosemirror-view": "1.42.8"
+  }
+}

@@ -1,40 +1,42 @@
-### Folio
+# Folio
 
-Notion-style workspace for pages, docs and databases, built natively on Frappe and ERPNext
+A Notion-style workspace — pages, docs and (soon) databases — built natively on the
+Frappe Framework, so it lives inside your ERPNext site next to projects, tasks,
+timesheets and people.
 
-### Installation
+**Status:** phase 1 (core pages) — see [docs/roadmap.md](docs/roadmap.md).
 
-You can install this app using the [bench](https://github.com/frappe/bench) CLI:
+## Features today
+
+- Spaces (team-wide or private) with members and access levels
+- Nested pages with drag & drop, favorites, trash, ⌘K full-text search
+- Block editor: headings, lists, to-dos, quotes, callouts, code, tables, images,
+  links, @mentions, sub-page blocks, slash menu, drag handle
+- Icons, covers, full-width and locked pages, version history with restore
+- The same access rules in the Folio app and in the Frappe desk
+
+## Install
 
 ```bash
-cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch n
-bench install-app folio
+bench get-app https://github.com/eagleautomate/folio
+bench --site <site> install-app folio
+bench build --app folio
 ```
 
-### Contributing
+Open `https://<site>/folio`. Requires Frappe v16. ERPNext is optional today and
+required for the upcoming project/task features.
 
-This app uses `pre-commit` for code formatting and linting. Please [install pre-commit](https://pre-commit.com/#installation) and enable it for this repository:
+Try it with demo data:
 
 ```bash
-cd apps/folio
-pre-commit install
+bench --site <site> execute folio.demo.seed.run
 ```
 
-Pre-commit is configured to use the following tools for checking and formatting your code:
+## Development
 
-- ruff
-- eslint
-- prettier
-- pyupgrade
-### CI
+See [AGENTS.md](AGENTS.md) for layout, commands and conventions, and
+[docs/architecture.md](docs/architecture.md) for how it fits together.
 
-This app can use GitHub Actions for CI. The following workflows are configured:
+## License
 
-- CI: Installs this app and runs unit tests on every push to `develop` branch.
-- Linters: Runs [Frappe Semgrep Rules](https://github.com/frappe/semgrep-rules) and [pip-audit](https://pypi.org/project/pip-audit/) on every pull request.
-
-
-### License
-
-mit
+MIT

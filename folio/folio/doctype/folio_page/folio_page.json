@@ -1,0 +1,225 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-10-29 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "icon",
+  "cover",
+  "column_break_1",
+  "space",
+  "parent_page",
+  "sort_order",
+  "section_content",
+  "content",
+  "content_text",
+  "section_meta",
+  "full_width",
+  "is_locked",
+  "project",
+  "column_break_2",
+  "content_version",
+  "last_edited_by",
+  "last_edited_on",
+  "section_archive",
+  "is_archived",
+  "archived_by",
+  "archived_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Title"
+  },
+  {
+   "fieldname": "icon",
+   "fieldtype": "Data",
+   "label": "Icon"
+  },
+  {
+   "description": "CSS gradient or image URL",
+   "fieldname": "cover",
+   "fieldtype": "Data",
+   "label": "Cover"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "space",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Space",
+   "options": "Folio Space",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "parent_page",
+   "fieldtype": "Link",
+   "label": "Parent Page",
+   "options": "Folio Page",
+   "search_index": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "sort_order",
+   "fieldtype": "Float",
+   "label": "Sort Order"
+  },
+  {
+   "fieldname": "section_content",
+   "fieldtype": "Section Break",
+   "label": "Content"
+  },
+  {
+   "description": "TipTap / ProseMirror document JSON",
+   "fieldname": "content",
+   "fieldtype": "JSON",
+   "label": "Content"
+  },
+  {
+   "description": "Plain-text copy of content, for search",
+   "fieldname": "content_text",
+   "fieldtype": "Long Text",
+   "hidden": 1,
+   "label": "Content Text",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_meta",
+   "fieldtype": "Section Break",
+   "label": "Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "full_width",
+   "fieldtype": "Check",
+   "label": "Full Width"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_locked",
+   "fieldtype": "Check",
+   "label": "Locked"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "Bumped on every content save; used to detect concurrent edits",
+   "fieldname": "content_version",
+   "fieldtype": "Int",
+   "label": "Content Version",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_edited_by",
+   "fieldtype": "Link",
+   "label": "Last Edited By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_edited_on",
+   "fieldtype": "Datetime",
+   "label": "Last Edited On",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_archive",
+   "fieldtype": "Section Break",
+   "label": "Trash"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_archived",
+   "fieldtype": "Check",
+   "in_standard_filter": 1,
+   "label": "Archived",
+   "search_index": 1
+  },
+  {
+   "fieldname": "archived_by",
+   "fieldtype": "Link",
+   "label": "Archived By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "archived_on",
+   "fieldtype": "Datetime",
+   "label": "Archived On",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-29 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Folio",
+ "name": "Folio Page",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Folio Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 0,
+   "export": 0,
+   "print": 0,
+   "read": 1,
+   "report": 0,
+   "role": "Desk User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "search_fields": "title,space",
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title"
+}

@@ -1,0 +1,82 @@
+/* Folio editor typography. Uses frappe-ui design tokens via @apply so light
+   and dark themes follow the rest of the app. */
+
+.folio-prose {
+  @apply text-[16px] leading-[1.65] text-ink-gray-8;
+  min-height: 40vh;
+  padding-bottom: 30vh;
+}
+
+.folio-prose > * + * { @apply mt-1; }
+.folio-prose p { @apply my-0 py-0.5; }
+
+.folio-prose h1 { @apply mb-1 mt-8 text-[1.875rem] font-bold leading-tight text-ink-gray-9; }
+.folio-prose h2 { @apply mb-1 mt-6 text-[1.5rem] font-semibold leading-snug text-ink-gray-9; }
+.folio-prose h3 { @apply mb-0.5 mt-4 text-[1.25rem] font-semibold leading-snug text-ink-gray-9; }
+.folio-prose > :first-child { @apply mt-0; }
+
+.folio-prose a:not([data-type='page-link']) { @apply text-ink-gray-8 underline underline-offset-2; text-decoration-color: var(--outline-gray-4); }
+.folio-prose strong { @apply font-semibold; }
+.folio-prose mark { @apply rounded-sm bg-amber-100 px-0.5 text-inherit; }
+.folio-prose code:not(pre code) { @apply rounded bg-surface-gray-2 px-1 py-0.5 font-mono text-[0.85em] text-red-600; }
+
+.folio-prose ul, .folio-prose ol { @apply my-1 pl-6; }
+.folio-prose ul { @apply list-disc; }
+.folio-prose ol { @apply list-decimal; }
+.folio-prose li > p { @apply py-0.5; }
+.folio-prose li::marker { @apply text-ink-gray-5; }
+
+.folio-prose ul[data-type='taskList'] { @apply list-none pl-0.5; }
+.folio-prose ul[data-type='taskList'] li { @apply flex items-start gap-2; }
+.folio-prose ul[data-type='taskList'] li > label { @apply mt-[5px] flex-shrink-0 select-none; }
+.folio-prose ul[data-type='taskList'] li > label input {
+  @apply size-4 cursor-pointer rounded border-outline-gray-4 text-ink-gray-9 focus:ring-0 focus:ring-offset-0;
+}
+.folio-prose ul[data-type='taskList'] li > div { @apply min-w-0 flex-1; }
+.folio-prose ul[data-type='taskList'] li[data-checked='true'] > div { @apply text-ink-gray-4 line-through; }
+
+.folio-prose blockquote { @apply my-2 border-l-[3px] border-outline-gray-5 py-0.5 pl-4 text-ink-gray-8; }
+.folio-prose hr { @apply my-4 border-outline-gray-2; }
+.folio-prose hr.ProseMirror-selectednode { @apply border-blue-400; }
+
+.folio-prose pre {
+  @apply my-2 overflow-x-auto rounded-md bg-surface-gray-2 p-4 font-mono text-sm leading-relaxed text-ink-gray-8;
+}
+.folio-prose pre code { @apply bg-transparent p-0 text-inherit; }
+.folio-prose .hljs-comment, .folio-prose .hljs-quote { @apply italic text-ink-gray-5; }
+.folio-prose .hljs-keyword, .folio-prose .hljs-selector-tag, .folio-prose .hljs-built_in { @apply text-purple-600; }
+.folio-prose .hljs-string, .folio-prose .hljs-attr, .folio-prose .hljs-addition { @apply text-green-700; }
+.folio-prose .hljs-number, .folio-prose .hljs-literal { @apply text-amber-700; }
+.folio-prose .hljs-title, .folio-prose .hljs-section, .folio-prose .hljs-function { @apply text-blue-600; }
+.folio-prose .hljs-variable, .folio-prose .hljs-template-variable, .folio-prose .hljs-deletion { @apply text-red-600; }
+
+.folio-prose table { @apply my-3 w-full table-fixed border-collapse overflow-hidden text-[15px]; }
+.folio-prose td, .folio-prose th { @apply relative min-w-[4rem] border border-outline-gray-2 px-2 py-1.5 align-top; }
+.folio-prose th { @apply bg-surface-gray-1 text-left font-medium; }
+.folio-prose .selectedCell::after { @apply pointer-events-none absolute inset-0 bg-blue-500/10 content-['']; }
+.folio-prose .column-resize-handle { @apply pointer-events-none absolute -right-0.5 bottom-0 top-0 w-1 bg-blue-400; }
+.folio-prose .tableWrapper { @apply overflow-x-auto; }
+.folio-prose.resize-cursor { cursor: col-resize; }
+
+.folio-prose img.folio-image { @apply my-2 max-w-full rounded-md; }
+.folio-prose img.ProseMirror-selectednode { @apply ring-2 ring-blue-400; }
+
+.folio-callout { @apply my-2 flex gap-3 rounded-md bg-surface-gray-1 px-4 py-3; }
+.folio-callout-emoji { @apply mt-0.5 h-6 shrink-0 text-lg leading-6; }
+.folio-callout-content { @apply min-w-0 flex-1; }
+
+.folio-mention { @apply rounded bg-surface-gray-2 px-1 py-0.5 font-medium text-ink-gray-8; }
+.folio-page-link { @apply my-0.5; }
+.folio-page-link.is-selected { @apply rounded bg-blue-50 ring-1 ring-blue-300; }
+
+/* empty-block placeholder (TipTap only marks the block holding the cursor) */
+.folio-prose p.is-empty::before,
+.folio-prose h1.is-empty::before,
+.folio-prose h2.is-empty::before,
+.folio-prose h3.is-empty::before {
+  @apply pointer-events-none float-left h-0 text-ink-gray-4;
+  content: attr(data-placeholder);
+}
+.folio-drag-handle { @apply transition-opacity; }
+.ProseMirror-gapcursor::after { border-top-color: var(--ink-gray-8); }
+.folio-prose ::selection { @apply bg-blue-200/60; }

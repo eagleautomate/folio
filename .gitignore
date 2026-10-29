@@ -53,3 +53,11 @@ jspm_packages/
 
 # Aider AI Chat
 .aider*
+
+# built SPA (bench build regenerates these)
+folio/public/frontend
+folio/www/folio.html
+frontend/components.d.ts
+frontend/auto-imports.d.ts
+node_modules
+frontend/e2e/shots

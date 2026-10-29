@@ -28,7 +28,10 @@
 
 .folio-prose ul[data-type='taskList'] { @apply list-none pl-0.5; }
 .folio-prose ul[data-type='taskList'] li { @apply flex items-start gap-2; }
-.folio-prose ul[data-type='taskList'] li > label { @apply mt-[5px] flex-shrink-0 select-none; }
+/* label is exactly one text line tall (line-height + the paragraph's py-0.5),
+   so the checkbox centres on the first line at any font size */
+.folio-prose ul[data-type='taskList'] li > label { @apply flex h-[calc(1.65em+0.25rem)] flex-shrink-0 select-none items-center; }
+.folio-prose ul[data-type='taskList'] li > label input { @apply m-0; }
 .folio-prose ul[data-type='taskList'] li > label input {
   @apply size-4 cursor-pointer rounded border-outline-gray-4 text-ink-gray-9 focus:ring-0 focus:ring-offset-0;
 }

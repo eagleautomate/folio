@@ -4,8 +4,9 @@ A Notion-style workspace — pages, docs and (soon) databases — built natively
 Frappe Framework, so it lives inside your ERPNext site next to projects, tasks,
 timesheets and people.
 
-**Status:** core pages done; ERPNext projects and tasks in progress. Full list of
-what it does: [docs/features.md](docs/features.md). Plans: [docs/roadmap.md](docs/roadmap.md).
+**Status:** core pages and ERPNext projects/tasks are usable; more on the roadmap.
+What it does: [docs/features.md](docs/features.md). Setting it up and controlling
+access: [docs/admin.md](docs/admin.md). Plans: [docs/roadmap.md](docs/roadmap.md).
 
 ## Highlights
 
@@ -15,6 +16,8 @@ what it does: [docs/features.md](docs/features.md). Plans: [docs/roadmap.md](doc
   tab (List / Kanban board / Table, task side panel)
 - Projects overview of every project; New project from Folio
 - `/task` and `/project` blocks backed by the real ERPNext records and permissions
+- Access follows Frappe: spaces with members, and project pages that obey ERPNext's
+  Project permissions and User Permissions
 
 ## Install
 

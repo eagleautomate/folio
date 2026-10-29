@@ -31,7 +31,9 @@ Each step ships on its own and is verified (tests + build + browser check) befor
 
 ## Phase 3 — ERPNext layer (current)
 
-- [ ] Linked database views over Task / Project / Timesheet / Issue (permission-checked)
+- [x] Project pages follow Frappe's Project permission (roles + User Permissions), sub-pages included
+
+- [~] Linked database views over Task / Project / Timesheet / Issue (permission-checked) — done for Tasks (project Tasks tab) and Projects (overview); Timesheet / Issue to do
 - [x] `/task` block = real ERPNext Task: create or link, tick = Completed, live status/assignees/due date, refresh on focus, ERPNext permissions
 - [ ] Record mentions (`@PROJ-0001`) with live status chips
 - [x] Auto page per Project, always in the Projects space: renamed with it, trashed on delete, backfill button

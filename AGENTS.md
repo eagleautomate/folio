@@ -5,7 +5,7 @@ Folio is a Notion/AppFlowy-style workspace (pages, docs, later databases) built 
 Projects, Tasks, Timesheets and Users directly, with the same login and permissions.
 
 Read this file first, then `docs/architecture.md`. `docs/features.md` lists what users
-can do today; `docs/roadmap.md` says what is done and what is next; `docs/decisions.md`
+can do today; `docs/admin.md` covers setting it up and controlling access; `docs/roadmap.md` says what is done and what is next; `docs/decisions.md`
 says why things are the way they are.
 
 ## Ground rules
@@ -24,32 +24,43 @@ says why things are the way they are.
 ## Layout
 
 ```
-folio/                         Python package (the Frappe app)
-  hooks.py                     routes, install hooks, permission hooks
-  permissions.py               ALL access rules (space-based) + desk hooks
-  utils.py                     ProseMirror JSON -> text, snippets, sort helpers
-  install.py                   creates roles "Folio Manager", "Folio User"
+folio/                           Python package (the Frappe app)
+  hooks.py                       routes, install hooks, permission hooks, Project doc_events
+  permissions.py                 ALL access rules: spaces + ERPNext Project cap, desk hooks
+  projects.py                    Project doc_events: auto project pages, rename, trash, backfill
+  content.py                     ProseMirror JSON builders (page templates, demo, tests)
+  utils.py                       ProseMirror JSON -> text, snippets, sort helpers
+  install.py                     roles "Folio Manager" / "Folio User", Folio Settings defaults
+  patches.txt, patches/v0_1/     data migrations (project page layout, sub-page project links)
   api/
-    workspace.py               get_boot, get_sidebar, search, get_recent, get_users
-    pages.py                   page CRUD, save_content (conflict check), move, trash, versions, favorites
-    spaces.py                  space CRUD + members
-    tasks.py                   ERPNext task blocks (create/link/tick, ERPNext permissions)
-    projects.py                live project data (header, Tasks tab, card), set_status
-  projects.py                  Project doc_events: auto project pages, rename, trash, backfill
-  content.py                   ProseMirror JSON builders (page templates, demo, tests)
-  folio/doctype/               Folio Space, Folio Space Member, Folio Page,
-                               Folio Page Version, Folio Favorite
-  www/folio.py                 serves the SPA at /folio (boot data, login redirect)
-  demo/seed.py, content.py     demo data + ProseMirror JSON builders
-  tests/test_folio.py          integration tests
-frontend/                      Vue 3 + frappe-ui + TipTap SPA (Vite)
-  src/data/workspace.js        sidebar store: spaces, flat page list, favorites
-  src/pages/Page.vue           page view: header, autosave, conflict handling
-  src/components/project/      project page: ProjectPage (tabs), ProjectHeader, ProjectTasks
-  src/data/project.js          useProject(): live ERPNext project data for a project page
-  src/components/editor/       TipTap editor, slash menu, callout, page links, mentions
-  src/components/Sidebar.vue   sidebar + PageTreeItem.vue (recursive tree, drag & drop)
-  e2e/smoke.mjs                Puppeteer smoke test
+    workspace.py                 get_boot, get_sidebar, search, get_recent, get_users
+    pages.py                     page CRUD, save_content (conflict check), move, trash, versions, favorites
+    spaces.py                    space CRUD, settings, members, delete
+    tasks.py                     ERPNext tasks: blocks, create/link/tick, update_task, set_assignees
+    projects.py                  ERPNext projects: get_project, list_projects, create_project, set_status
+  folio/doctype/                 Folio Space (+ Member), Folio Page, Folio Page Version,
+                                 Folio Favorite, Folio Settings (single)
+  www/folio.py                   serves the SPA at /folio (boot data, login redirect)
+  demo/seed.py                   demo data (run / clear)
+  tests/                         test_folio (spaces, pages, access), test_tasks, test_projects,
+                                 test_project_access (ERPNext permission cap)
+frontend/                        Vue 3 + frappe-ui + TipTap SPA (Vite), eslint.config.js
+  src/router.js                  /, /p/:name (page), /projects (overview)
+  src/data/                      workspace.js (sidebar store), tasks.js (task cache + edits),
+                                 project.js (useProject: live project for a project page)
+  src/pages/                     Home, Page (autosave, conflicts, project wrapper), Projects (overview)
+  src/components/                Sidebar + PageTreeItem (tree, drag & drop), SearchDialog,
+                                 TrashDialog, NewSpaceDialog, SpaceSettingsDialog, VersionHistory,
+                                 EmojiPicker
+  src/components/editor/         Editor, extensions.js (the schema), slash menu, formatting menu,
+                                 blocks: callout, pageLink, taskBlock, projectBlock (+ *View.vue),
+                                 TaskRow, mentions, editor.css
+  src/components/project/        ProjectPage (tabs), ProjectHeader, ProjectTasks (List/Board/Table),
+                                 TaskBoard, TaskCard, TaskTable, TaskCheck, TaskPanel, NewProjectDialog
+  src/utils/                     dates, debounce, upload (+ *.test.js unit tests)
+  e2e/                           Puppeteer browser tests (see Commands)
+docs/                            features (for users), admin (running it), architecture,
+                                 roadmap, decisions
 ```
 
 ## Local environment

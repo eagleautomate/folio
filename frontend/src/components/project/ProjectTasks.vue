@@ -6,6 +6,9 @@
     <p v-else-if="project.restricted || project.missing" class="py-6 text-base text-ink-gray-5">
       Tasks aren't available for this project.
     </p>
+    <p v-else-if="!project.can_read_tasks" class="flex items-center gap-2 py-6 text-base text-ink-gray-5">
+      <LucideLock class="size-4" /> You don't have access to tasks in ERPNext. Ask your administrator for the Projects User role.
+    </p>
 
     <template v-else>
       <!-- toolbar -->

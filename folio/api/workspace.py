@@ -6,7 +6,7 @@
 import frappe
 from frappe.utils import cint, now_datetime
 
-from folio.permissions import get_space_access, is_folio_manager, is_folio_user
+from folio.permissions import filter_visible_pages, get_space_access, is_folio_manager, is_folio_user
 from folio.utils import make_snippet
 
 
@@ -51,6 +51,9 @@ def get_sidebar() -> dict:
 			fields=["name", "title", "icon", "space", "parent_page", "sort_order", "project", "is_project_page"],
 			order_by="sort_order asc, creation asc",
 		)
+		# pages linked to an ERPNext project the user can't read disappear (with their sub-pages,
+		# which carry the same project); read-only projects come back with access "view"
+		pages = filter_visible_pages(pages)
 		add_project_status(pages)
 
 	visible = {p.name for p in pages}
@@ -82,6 +85,8 @@ def get_boot() -> dict:
 		"server_now": str(now_datetime()),
 		# the space holding project pages, so the sidebar can show "All projects"
 		"projects_space": frappe.db.get_single_value("Folio Settings", "projects_space"),
+		# whether to offer "All projects" / "New project" at all (Frappe's Project permission)
+		"can_read_projects": "erpnext" in frappe.get_installed_apps() and bool(frappe.has_permission("Project", "read")),
 	}
 
 
@@ -93,12 +98,12 @@ def search(query: str, limit: int = 20) -> list[dict]:
 	if not spaces:
 		return []
 
-	fields = ["name", "title", "icon", "space", "content_text", "last_edited_on"]
+	fields = ["name", "title", "icon", "space", "project", "content_text", "last_edited_on"]
 	base = {"space": ["in", list(spaces)], "is_archived": 0}
 	limit = min(cint(limit) or 20, 50)
 
 	if not query:
-		rows = frappe.get_all("Folio Page", filters=base, fields=fields, order_by="last_edited_on desc", limit=limit)
+		rows = frappe.get_all("Folio Page", filters=base, fields=fields, order_by="last_edited_on desc", limit=limit * 3)
 	else:
 		like = f"%{query}%"
 		by_title = frappe.get_all(
@@ -106,7 +111,7 @@ def search(query: str, limit: int = 20) -> list[dict]:
 			filters={**base, "title": ["like", like]},
 			fields=fields,
 			order_by="last_edited_on desc",
-			limit=limit,
+			limit=limit * 3,
 		)
 		seen = {r.name for r in by_title}
 		by_text = frappe.get_all(
@@ -114,10 +119,11 @@ def search(query: str, limit: int = 20) -> list[dict]:
 			filters={**base, "content_text": ["like", like], "name": ["not in", list(seen) or [""]]},
 			fields=fields,
 			order_by="last_edited_on desc",
-			limit=limit,
+			limit=limit * 3,
 		)
-		rows = (by_title + by_text)[:limit]
+		rows = by_title + by_text
 
+	rows = filter_visible_pages(rows)[:limit]
 	return [
 		{
 			"name": r.name,
@@ -141,10 +147,11 @@ def get_recent(limit: int = 8) -> list[dict]:
 	rows = frappe.get_all(
 		"Folio Page",
 		filters={"space": ["in", list(spaces)], "is_archived": 0},
-		fields=["name", "title", "icon", "space", "cover", "last_edited_by", "last_edited_on"],
+		fields=["name", "title", "icon", "space", "project", "cover", "last_edited_by", "last_edited_on"],
 		order_by="last_edited_on desc",
-		limit=min(cint(limit) or 8, 30),
+		limit=min(cint(limit) or 8, 30) * 3,
 	)
+	rows = filter_visible_pages(rows)[: min(cint(limit) or 8, 30)]
 	for r in rows:
 		r.space_title = spaces[r.space].title
 	return rows

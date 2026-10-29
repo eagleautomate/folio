@@ -14,7 +14,7 @@ from frappe import _
 from frappe.utils import cint, now_datetime, time_diff_in_seconds
 
 from folio.folio.doctype.folio_page.folio_page import get_descendants
-from folio.permissions import check_page_access, check_space_access, has_level
+from folio.permissions import check_page_access, check_space_access, filter_visible_pages, has_level
 from folio.utils import next_sort_order
 
 # A new version snapshot is kept at most this often per page and author.
@@ -89,6 +89,7 @@ def create_page(
 		parent_space = frappe.db.get_value("Folio Page", parent_page, "space")
 		if parent_space != space:
 			frappe.throw(_("Parent page must be in the same space"))
+		check_page_access(parent_page, "edit")  # under a project page: needs write on the project
 
 	doc = frappe.get_doc(
 		{
@@ -206,6 +207,8 @@ def move_page(name: str, space: str, parent_page: str | None = None, index: int 
 	check_page_access(name, "edit")
 	check_space_access(space, "edit")
 	parent_page = parent_page or None
+	if parent_page:
+		check_page_access(parent_page, "edit")
 	index = max(0, cint(index))
 
 	doc = frappe.get_doc("Folio Page", name)
@@ -245,7 +248,8 @@ def duplicate_page(name: str) -> dict:
 
 	def copy(source, parent_page, title):
 		new = frappe.copy_doc(source)
-		new.update({"parent_page": parent_page, "title": title, "is_locked": 0, "content_version": 0})
+		# a copy is never the project's page (there is exactly one per project)
+		new.update({"parent_page": parent_page, "title": title, "is_locked": 0, "content_version": 0, "is_project_page": 0})
 		new.insert(ignore_permissions=True)
 		for child in frappe.get_all(
 			"Folio Page", filters={"parent_page": source.name, "is_archived": 0}, pluck="name"
@@ -309,10 +313,11 @@ def get_trash() -> list[dict]:
 	pages = frappe.get_all(
 		"Folio Page",
 		filters={"space": ["in", spaces], "is_archived": 1},
-		fields=["name", "title", "icon", "space", "parent_page", "archived_by", "archived_on"],
+		fields=["name", "title", "icon", "space", "project", "parent_page", "archived_by", "archived_on"],
 		order_by="archived_on desc",
 		limit=200,
 	)
+	pages = [p for p in filter_visible_pages(pages) if has_level(p.access, "edit")]
 	# Only show the top of each archived subtree.
 	archived = {p.name for p in pages}
 	return [p for p in pages if p.parent_page not in archived]

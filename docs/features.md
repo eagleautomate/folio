@@ -76,6 +76,20 @@ guests can't.
 Everything here reads and writes the real ERPNext records, using ERPNext's own
 permissions and rules. Folio never keeps a copy of task or project data.
 
+**Who sees a project's page** is decided by Frappe's own permissions on that Project
+(roles and User Permissions), on top of the space rules:
+
+- can't read the Project in ERPNext → its page and sub-pages are hidden everywhere
+  in Folio (sidebar, search, Home, trash, the Desk list) and links to them say
+  "This page isn't available";
+- can read but not edit the Project → its pages are read-only;
+- people without access to projects at all don't see "All projects", and get a clear
+  message if they open it;
+- people who can read projects but not tasks see the project without its task list.
+
+Being on a project's team or assigned its tasks doesn't matter for this: ERPNext
+itself lets every Projects User see every project unless a User Permission limits it.
+
 ### A page for every project
 
 - **Every ERPNext Project gets a Folio page automatically**, in the **Projects**

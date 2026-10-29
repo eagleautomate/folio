@@ -45,8 +45,18 @@ change the space and its members. The same functions back:
 - the desk (`has_permission` and `permission_query_conditions` hooks), so a private page
   can't be found through `/desk/folio-page` or `frappe.get_list` either.
 
-Access is cached per request in `frappe.local.folio_space_access`; call
-`clear_access_cache()` after changing members.
+**Pages linked to an ERPNext project** (`Folio Page.project`: project pages, and their
+sub-pages, which inherit the link in `FolioPage.inherit_project`) are capped by
+`frappe.has_permission("Project", …)` for the same user, so role permissions and User
+Permissions apply unchanged: no read → no access, read without write → `view`
+(`get_project_cap`, `page_access`, `check_page_access`). Lists (sidebar, search, recent,
+trash) go through `filter_visible_pages`; the desk list uses
+`permission_query_conditions` with the projects `frappe.get_list` returns for the user.
+Managers are capped too: Folio roles never widen ERPNext access.
+
+Access is cached per request in `frappe.local.folio_space_access` /
+`folio_project_cap` / `folio_readable_projects`; call `clear_access_cache()` after
+changing members.
 
 Space settings (`SpaceSettingsDialog.vue`, opened from the space's ⋯ menu) use
 `spaces.get_space` (members with names, `can_manage`, `page_count`,

@@ -84,7 +84,7 @@
         <template v-if="!collapsed[space.name]">
           <!-- the projects space opens with its overview of all projects -->
           <div
-            v-if="space.name === state.boot?.projects_space"
+            v-if="space.name === state.boot?.projects_space && state.boot?.can_read_projects"
             class="flex h-7 cursor-pointer items-center gap-2 rounded px-1 text-base text-ink-gray-7 hover:bg-surface-gray-2"
             :class="{ '!bg-surface-gray-3 font-medium text-ink-gray-9': $route.name === 'Projects' }"
             style="padding-left: 4px"

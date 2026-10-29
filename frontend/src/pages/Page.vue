@@ -161,7 +161,6 @@ let saving = null
 const page = createResource({
   url: 'folio.api.pages.get_page',
   params: { name: props.name },
-  auto: true,
   onSuccess(data) {
     doc.value = data
     title.value = data.title || ''
@@ -171,6 +170,10 @@ const page = createResource({
     if (!data.title && data.can_edit) nextTick(() => titleInput.value?.focus())
   },
 })
+
+// Not `auto: true`: frappe-ui re-throws auto-fetch errors as unhandled rejections.
+// No access / deleted is expected; the template shows "This page isn't available".
+page.fetch().catch(() => {})
 
 const breadcrumbs = computed(() => [
   ...(doc.value?.breadcrumbs || []),

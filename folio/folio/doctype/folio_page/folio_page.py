@@ -16,6 +16,21 @@ class FolioPage(Document):
 		self.title = (self.title or "").strip()
 		self.normalize_content()
 		self.validate_parent()
+		self.inherit_project()
+
+	def inherit_project(self):
+		"""Sub-pages of a project page carry its project, so they follow its ERPNext permissions."""
+		if self.is_project_page:
+			return
+		parent_project = frappe.db.get_value("Folio Page", self.parent_page, "project") if self.parent_page else None
+		before = self.get_doc_before_save()
+		was_inherited = before and before.parent_page and before.project == frappe.db.get_value(
+			"Folio Page", before.parent_page, "project"
+		)
+		if parent_project:
+			self.project = parent_project
+		elif was_inherited and self.has_value_changed("parent_page"):
+			self.project = None  # moved out from under a project page
 
 	def normalize_content(self):
 		doc = parse_content(self.content)
@@ -49,6 +64,10 @@ class FolioPage(Document):
 		if not self.is_new() and self.has_value_changed("space"):
 			for child in get_descendants(self.name):
 				frappe.db.set_value("Folio Page", child, "space", self.space, update_modified=False)
+		# ...and its project link (which decides ERPNext-based access) follows too.
+		if not self.is_new() and self.has_value_changed("project"):
+			for child in get_descendants(self.name):
+				frappe.db.set_value("Folio Page", child, "project", self.project, update_modified=False)
 
 	def on_trash(self):
 		for child in frappe.get_all("Folio Page", filters={"parent_page": self.name}, pluck="name"):

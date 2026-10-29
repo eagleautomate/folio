@@ -39,7 +39,8 @@ def get_project(name: str, limit: int = 100) -> dict:
 	if not frappe.has_permission("Project", "read", name):
 		return {"name": name, "restricted": True}
 
-	tasks = frappe.get_list(  # ERPNext row-level permissions apply
+	can_read_tasks = bool(frappe.has_permission("Task", "read"))
+	tasks = [] if not can_read_tasks else frappe.get_list(  # ERPNext row-level permissions apply
 		"Task",
 		filters={"project": name, "status": ["!=", "Template"]},
 		fields=TASK_FIELDS,
@@ -73,6 +74,7 @@ def get_project(name: str, limit: int = 100) -> dict:
 		"counts": counts,
 		"tasks": serialized,
 		"can_complete": row.percent_complete_method == "Manual" or not counts["open"],
+		"can_read_tasks": can_read_tasks,
 	}
 
 
@@ -130,6 +132,11 @@ def list_projects(scope: str = "active", mine: int = 0, query: str | None = None
 	``mine``: only projects where the user is a project member, has a task, or created it.
 	"""
 	require_erpnext()
+	if not frappe.has_permission("Project", "read"):
+		frappe.throw(
+			frappe._("You don't have access to projects in ERPNext. Ask your administrator for the Projects User role."),
+			frappe.PermissionError,
+		)
 	filters = {}
 	if scope == "active":
 		filters["status"] = ["in", ACTIVE]
@@ -146,7 +153,8 @@ def list_projects(scope: str = "active", mine: int = 0, query: str | None = None
 	names = [p.name for p in projects]
 
 	counts = {n: {"total": 0, "open": 0, "completed": 0, "overdue": 0} for n in names}
-	for row in frappe.get_list(
+	can_read_tasks = bool(frappe.has_permission("Task", "read"))
+	for row in [] if not can_read_tasks else frappe.get_list(
 		"Task",
 		filters={"project": ["in", names], "status": ["!=", "Template"]},
 		fields=["project", "status", {"COUNT": "*", "as": "n"}],
@@ -158,7 +166,7 @@ def list_projects(scope: str = "active", mine: int = 0, query: str | None = None
 		if row.status == "Overdue":
 			c["overdue"] += row.n
 	# late but not yet flagged by ERPNext's daily job
-	for row in frappe.get_list(
+	for row in [] if not can_read_tasks else frappe.get_list(
 		"Task",
 		# list form: two conditions on exp_end_date. Without "is set", Frappe compares
 		# ifnull(exp_end_date, '0001-01-01') and every task without a due date looks late.

@@ -81,6 +81,7 @@ cd apps/folio/frontend && node e2e/board.mjs e2e/shots          # board / table 
 cd apps/folio/frontend && node e2e/overview.mjs e2e/shots       # projects overview browser test
 cd apps/folio/frontend && node e2e/sidebar.mjs e2e/shots        # finished projects leave the sidebar
 cd apps/folio/frontend && node e2e/spaces.mjs e2e/shots         # space settings dialog
+cd apps/folio/frontend && node e2e/access.mjs e2e/shots         # project pages follow ERPNext permissions (real users)
 cd apps/folio/frontend && yarn lint                             # ESLint (Vue + JS)
 
 bench --site folio.localhost execute folio.demo.seed.run        # demo data (idempotent)
@@ -111,6 +112,12 @@ its subtree to the trash; deleting is only allowed from the trash.
 - A user with no roles is silently a *Website User*. Give test/demo users a desk
   role (`Folio User`) or `is_folio_user()` correctly rejects them.
 - `frappe.desk.form.assign_to.add()` takes no `ignore_permissions` kwarg.
+- ERPNext gives **Desk User** read on Project only at permlevel 1 (fields), so plain
+  desk users can't open Projects; Projects User / Projects Manager can.
+- frappe-ui `createResource({ auto: true })` re-throws fetch errors as unhandled
+  rejections even with `onError`; for loads that may be refused, call
+  `resource.fetch().catch(() => {})` yourself (see `Page.vue`).
+- `frappe.client.get_list` ignores `pluck` (returns `[{ name }]`).
 - ERPNext's Task permissions are on **Projects User** only; Projects Manager alone
   cannot create Tasks. Demo/test users that create tasks need Projects User.
 - A Single DocType's field defaults aren't stored until saved; `install.ensure_settings`

@@ -2,6 +2,16 @@
 
 Short records of choices that someone might otherwise undo. Newest first.
 
+## 2026-10-29 — Project pages follow Frappe's Project permission
+
+A page linked to a Project (and its sub-pages) is visible only to people who can read
+that Project in Frappe, and editable only by people who can write it; space access
+can only narrow this further. Reason: project pages lived in a space everyone could
+edit, so someone restricted by a User Permission could still read and edit a
+project's Overview. We reuse Frappe's mechanisms (`has_permission`, `get_list`, User
+Permissions) rather than inventing Folio-specific project access, so admins manage it
+in one place. Folio Manager doesn't override it.
+
 ## 2026-10-29 — Follow ERPNext's rule for completing projects
 
 ERPNext derives Open/Completed from task progress (unless % complete is Manual) and

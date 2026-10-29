@@ -220,3 +220,25 @@ class TestProjectPages(IntegrationTestCase):
 		self.assertFalse(project_api.can_create_project())
 		self.assertRaises(frappe.PermissionError, project_api.create_project, "Nope")
 
+	def test_sidebar_marks_project_status(self):
+		from folio.api import workspace
+
+		project = self.make_project()
+		page = projects.get_project_page(project.name)
+		project.status = "Completed"
+		project.save()
+		row = next(p for p in workspace.get_sidebar()["pages"] if p.name == page)
+		self.assertEqual(row.project_status, "Completed")
+		self.assertTrue(row.is_project_page)
+
+	def test_completed_needs_tasks_done_unless_manual(self):
+		project = self.make_project()
+		frappe.get_doc({"doctype": "Task", "subject": "still open", "project": project.name}).insert()
+		self.assertFalse(project_api.get_project(project.name)["can_complete"])
+		self.assertRaises(frappe.ValidationError, project_api.set_status, project.name, "Completed")
+		self.assertEqual(frappe.db.get_value("Project", project.name, "status"), "Open")  # nothing saved
+
+		frappe.db.set_value("Project", project.name, "percent_complete_method", "Manual")
+		self.assertTrue(project_api.get_project(project.name)["can_complete"])
+		self.assertEqual(project_api.set_status(project.name, "Completed")["status"], "Completed")
+

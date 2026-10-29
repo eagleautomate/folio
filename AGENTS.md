@@ -79,6 +79,7 @@ cd apps/folio/frontend && node e2e/tasks.mjs e2e/shots          # ERPNext task-b
 cd apps/folio/frontend && node e2e/projects.mjs e2e/shots       # project pages browser test
 cd apps/folio/frontend && node e2e/board.mjs e2e/shots          # board / table / task panel browser test
 cd apps/folio/frontend && node e2e/overview.mjs e2e/shots       # projects overview browser test
+cd apps/folio/frontend && node e2e/sidebar.mjs e2e/shots        # finished projects leave the sidebar
 cd apps/folio/frontend && yarn lint                             # ESLint (Vue + JS)
 
 bench --site folio.localhost execute folio.demo.seed.run        # demo data (idempotent)
@@ -115,6 +116,9 @@ its subtree to the trash; deleting is only allowed from the trash.
   writes Folio Settings defaults on install/migrate.
 - `patches.txt` (like `apps.txt`) may lack a trailing newline: appending with `>>`
   glues your patch onto the last comment and it silently never runs.
+- ERPNext's `Project.validate` recomputes status from tasks (unless % complete is
+  Manual): saving `status = "Completed"` with open tasks silently becomes "Open". Check
+  the saved value; don't assume a save kept what you set.
 - Date filters treat NULL as `0001-01-01` (`ifnull(...)`): `["<", today()]` matches
   rows with no date. Add `["field", "is", "set"]` (list-form filters) when that matters.
 - `bench execute` hides import errors as `NameError: name 'folio' is not defined`;

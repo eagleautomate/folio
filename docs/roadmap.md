@@ -38,7 +38,7 @@ Each step ships on its own and is verified (tests + build + browser check) befor
 - [x] Project page layout: live header (status switch, progress, dates, priority, customer, team) + Overview / Tasks tabs; `/task` scoped to the project; `/project` card only on ordinary pages
 - [x] Tasks tab views: List, Board (Kanban, group by status / assignee / priority, drag to change) and Table (sortable); task side panel (title, status, assignees, priority, dates, description)
 - [x] Projects overview (`/folio/projects`, "All projects" in the sidebar): table + board by status (drag to change), active/completed/all, search, "My projects", New project
-- [ ] Sidebar shows active projects only
+- [x] Sidebar shows active projects only ("N completed" link to the overview)
 - [ ] Timesheet timer on task blocks + weekly timesheet grid
 
 ## Phase 4 — Collaboration

@@ -83,7 +83,15 @@
             <span class="flex size-5 items-center justify-center"><LucideLayoutGrid class="size-4 text-ink-gray-5" /></span>
             All projects
           </div>
-          <PageTreeItem v-for="page in childrenOf(space.name)" :key="page.name" :page="page" />
+          <PageTreeItem v-for="page in visiblePages(space.name)" :key="page.name" :page="page" />
+          <button
+            v-if="finishedCount(space.name)"
+            class="flex h-7 w-full items-center gap-2 rounded px-1 text-left text-sm text-ink-gray-5 hover:bg-surface-gray-2"
+            @click="$router.push({ name: 'Projects', query: { scope: 'completed' } })"
+          >
+            <span class="flex size-5 items-center justify-center"><LucideArchive class="size-3.5" /></span>
+            {{ finishedCount(space.name) }} completed
+          </button>
           <button
             v-if="!childrenOf(space.name).length && canEditSpace(space.name)"
             class="flex h-7 w-full items-center gap-2 rounded px-2 text-base text-ink-gray-5 hover:bg-surface-gray-2"
@@ -108,7 +116,7 @@
 
 <script setup>
 import { computed, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { Dropdown, toast } from 'frappe-ui'
 import SidebarLink from '@/components/SidebarLink.vue'
 import PageTreeItem from '@/components/PageTreeItem.vue'
@@ -120,11 +128,23 @@ import { search } from '@/composables/search'
 import { pageTitle } from '@/utils'
 
 const router = useRouter()
+const route = useRoute()
 const logoUrl = '/assets/folio/images/folio-logo.svg'
 const trashOpen = ref(false)
 const spaceOpen = ref(false)
 const dropOnSpace = ref(null)
 const collapsed = reactive(loadCollapsed())
+
+// Finished projects (Completed / Cancelled) stay out of the sidebar; "All projects" has them.
+// The page you're on is always shown, so the sidebar never loses your place.
+const FINISHED = ['Completed', 'Cancelled']
+const isFinished = (page) => page.is_project_page && FINISHED.includes(page.project_status)
+function visiblePages(space) {
+  return childrenOf(space).filter((p) => !isFinished(p) || route.params.name === p.name)
+}
+function finishedCount(space) {
+  return childrenOf(space).filter((p) => isFinished(p) && route.params.name !== p.name).length
+}
 
 const favoritePages = computed(() => state.favorites.map((name) => pagesByName.value[name]).filter(Boolean))
 

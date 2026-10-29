@@ -52,6 +52,7 @@
 import { computed } from 'vue'
 import { Avatar, Badge, Dropdown, LoadingIndicator, call, toast } from 'frappe-ui'
 import { formatDateRange } from '@/utils'
+import { loadWorkspace } from '@/data/workspace'
 
 const props = defineProps({ project: { type: Object, default: null } })
 const emit = defineEmits(['updated'])
@@ -60,17 +61,24 @@ const pct = computed(() => Math.round(Math.min(100, props.project?.percent_compl
 
 const dates = computed(() => formatDateRange(props.project?.expected_start_date, props.project?.expected_end_date))
 
+// ERPNext sets Completed itself when the tasks are done (unless % complete is Manual),
+// so "Completed" is only offered when ERPNext will accept it.
 const statusOptions = computed(() =>
-  ['Open', 'On hold', 'Completed', 'Cancelled'].map((status) => ({
-    label: status,
-    onClick: () => setStatus(status),
-  })),
+  ['Open', 'On hold', 'Completed', 'Cancelled'].map((status) => {
+    const blocked = status === 'Completed' && !props.project.can_complete
+    return {
+      label: blocked ? `Completed (finish ${props.project.counts.open} open task${props.project.counts.open === 1 ? '' : 's'} first)` : status,
+      disabled: blocked,
+      onClick: () => setStatus(status),
+    }
+  }),
 )
 
 async function setStatus(status) {
   if (status === props.project.status) return
   try {
     emit('updated', await call('folio.api.projects.set_status', { name: props.project.name, status }))
+    loadWorkspace() // finished projects leave the sidebar
   } catch (e) {
     toast.error(e?.messages?.[0] || 'Could not change the status')
   }

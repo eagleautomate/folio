@@ -265,6 +265,7 @@ async function onDrop(e, status) {
   try {
     await call('folio.api.projects.set_status', { name, status })
     project.status = status
+    loadWorkspace() // finished projects leave the sidebar
   } catch (err) {
     toast.error(err?.messages?.[0] || 'Could not change the status')
   }

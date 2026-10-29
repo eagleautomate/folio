@@ -75,6 +75,9 @@ permissions and rules. Folio never keeps a copy of task or project data.
   one button.
 - **Project page header**, live from ERPNext: status (change it right there),
   % complete, dates, priority, customer, team, link to the project in the Desk.
+  ERPNext marks a project *Completed* by itself once all its tasks are done, so
+  "Completed" is only offered then (or when the project's % complete is set to
+  Manual); *On hold* and *Cancelled* can be set any time.
 - **Overview** tab: free-form notes, goals and decisions for the project.
 - **Tasks** tab: the project's one task list.
   - **List** view: filter, "My tasks", add a task (Enter), tick to complete,
@@ -90,6 +93,8 @@ permissions and rules. Folio never keeps a copy of task or project data.
 
 ### Projects overview
 
+- **Sidebar** shows only active projects under Projects; completed and cancelled ones
+  move to a "N completed" link (the page you have open always stays visible).
 - **All projects** (top of the Projects space in the sidebar, or `/folio/projects`):
   every project you can see in ERPNext, with status, progress, dates, open and
   overdue tasks, and team.

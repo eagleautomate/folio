@@ -2,6 +2,13 @@
 
 Short records of choices that someone might otherwise undo. Newest first.
 
+## 2026-10-29 — Follow ERPNext's rule for completing projects
+
+ERPNext derives Open/Completed from task progress (unless % complete is Manual) and
+silently resets a manual "Completed". Folio doesn't fight it: Completed is offered only
+when ERPNext will keep it, and the API says why otherwise. Finished projects
+(Completed/Cancelled) leave the sidebar but stay in "All projects".
+
 ## 2026-10-29 — Project pages are structured, and own the project's task list
 
 A project page has a fixed live header and an Overview / Tasks layout rendered by the

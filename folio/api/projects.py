@@ -25,6 +25,7 @@ PROJECT_FIELDS = [
 	"expected_end_date",
 	"priority",
 	"customer",
+	"percent_complete_method",
 ]
 
 
@@ -71,6 +72,7 @@ def get_project(name: str, limit: int = 100) -> dict:
 		"can_create_task": bool(frappe.has_permission("Task", "create")),
 		"counts": counts,
 		"tasks": serialized,
+		"can_complete": row.percent_complete_method == "Manual" or not counts["open"],
 	}
 
 
@@ -91,6 +93,16 @@ def set_status(name: str, status: str) -> dict:
 	project.check_permission("write")
 	project.status = status
 	project.save()
+	if project.status != status:
+		# ERPNext derives Open/Completed from task progress unless % complete is Manual
+		open_tasks = frappe.db.count("Task", {"project": name, "status": ["not in", ("Completed", "Cancelled", "Template")]})
+		frappe.throw(
+			frappe._(
+				"ERPNext marks this project Completed by itself once its tasks are done. "
+				"Complete or cancel its {0} open task(s) first, or set % Complete to Manual on the project."
+			).format(open_tasks),
+			title=frappe._("Project still has open tasks"),
+		)
 	return get_project(name)
 
 
@@ -214,6 +226,7 @@ def list_projects(scope: str = "active", mine: int = 0, query: str | None = None
 				"team": [user_info(u) for u in members.get(p.name, [])],
 				"page": pages.get(p.name),
 				"can_edit": bool(frappe.has_permission("Project", "write", p.name)),
+				"can_complete": p.percent_complete_method == "Manual" or not counts[p.name]["open"],
 			}
 		)
 	return result

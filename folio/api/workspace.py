@@ -24,6 +24,17 @@ def get_accessible_spaces() -> list[frappe._dict]:
 	return result
 
 
+def add_project_status(pages: list) -> None:
+	"""Mark project pages with their ERPNext project's status (the sidebar hides finished ones)."""
+	projects = {p.project for p in pages if p.is_project_page and p.project}
+	if not projects or "erpnext" not in frappe.get_installed_apps():
+		return
+	status = dict(frappe.get_all("Project", filters={"name": ["in", list(projects)]}, fields=["name", "status"], as_list=True))
+	for page in pages:
+		if page.is_project_page and page.project:
+			page.project_status = status.get(page.project)
+
+
 @frappe.whitelist()
 def get_sidebar() -> dict:
 	"""Everything the sidebar needs in one call: spaces, the flat page tree, favorites."""
@@ -37,9 +48,10 @@ def get_sidebar() -> dict:
 		pages = frappe.get_all(
 			"Folio Page",
 			filters={"space": ["in", space_names], "is_archived": 0},
-			fields=["name", "title", "icon", "space", "parent_page", "sort_order"],
+			fields=["name", "title", "icon", "space", "parent_page", "sort_order", "project", "is_project_page"],
 			order_by="sort_order asc, creation asc",
 		)
+		add_project_status(pages)
 
 	visible = {p.name for p in pages}
 	favorites = [

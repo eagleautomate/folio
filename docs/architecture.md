@@ -139,6 +139,14 @@ ERPNext is optional. `folio.api.tasks.erpnext_enabled()` decides; the SPA reads
   overdue (status Overdue, or late but not yet flagged), team (members + open
   assignees) and its page. Board drag calls `set_status`. `create_project` inserts the
   Project with ERPNext permissions; the hook makes its page.
+- **Sidebar**: `get_sidebar` adds `project_status` to project pages; `Sidebar.vue` hides
+  Completed/Cancelled ones (except the open page) behind a "N completed" link.
+  Status changes call `loadWorkspace()` so the sidebar updates at once.
+- **Project status rule (ERPNext)**: unless `percent_complete_method` is Manual,
+  `Project.update_percent_complete` sets Open/Completed from task progress on every save,
+  silently undoing a manual "Completed". `set_status` detects that and throws a clear
+  message (nothing is saved); `get_project`/`list_projects` return `can_complete` so the
+  UI only offers Completed when ERPNext will keep it.
 - Backfill: Folio Settings → "Create pages for existing projects".
 - Patch `v0_1.project_page_layout` migrated older pages (removed the embedded
   project block, moved pages into the projects space).

@@ -19,13 +19,13 @@
             v-for="p in recent.data"
             :key="p.name"
             :to="{ name: 'Page', params: { name: p.name } }"
-            class="group flex h-32 flex-col overflow-hidden rounded-lg border border-outline-gray-1 bg-surface-white transition-shadow hover:shadow-md"
+            class="group flex h-32 flex-col overflow-hidden rounded-lg border border-outline-gray-1 bg-surface-base transition-shadow hover:shadow-md"
           >
             <div class="h-10 shrink-0 bg-surface-gray-2" :style="p.cover ? { background: p.cover } : {}" />
             <div class="-mt-4 flex flex-1 flex-col px-3 pb-2">
               <span class="text-2xl leading-none">
                 <template v-if="p.icon">{{ p.icon }}</template>
-                <LucideFileText v-else class="size-6 rounded bg-surface-white p-0.5 text-ink-gray-5" />
+                <LucideFileText v-else class="size-6 rounded bg-surface-base p-0.5 text-ink-gray-5" />
               </span>
               <span class="mt-1.5 line-clamp-2 text-base font-medium text-ink-gray-8">{{ pageTitle(p) }}</span>
               <span class="mt-auto truncate text-xs text-ink-gray-5">{{ timeAgo(p.last_edited_on) }} · {{ p.space_title }}</span>

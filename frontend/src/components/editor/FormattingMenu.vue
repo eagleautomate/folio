@@ -5,7 +5,7 @@
     :options="{ placement: 'top-start', offset: 8 }"
   >
     <div
-      class="flex items-center gap-0.5 rounded-lg border border-outline-gray-2 bg-surface-modal p-1 shadow-xl"
+      class="flex items-center gap-0.5 rounded-lg border border-outline-gray-2 bg-surface-elevation-2 p-1 shadow-xl"
       @mousedown.prevent
     >
       <template v-if="!linkMode">
@@ -17,7 +17,7 @@
             </button>
           </template>
         </Dropdown>
-        <div class="mx-0.5 h-5 w-px bg-outline-gray-2" />
+        <div class="mx-0.5 h-5 w-px bg-surface-gray-4" />
         <button
           v-for="action in marks"
           :key="action.name"

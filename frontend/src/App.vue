@@ -1,6 +1,6 @@
 <template>
   <FrappeUIProvider>
-    <div class="flex h-full w-full overflow-hidden bg-surface-white text-ink-gray-8">
+    <div class="flex h-full w-full overflow-hidden bg-surface-base text-ink-gray-8">
       <Sidebar v-if="state.loaded" />
       <main class="flex min-w-0 flex-1 flex-col">
         <div v-if="error" class="m-auto max-w-sm text-center text-p-sm text-ink-gray-6">

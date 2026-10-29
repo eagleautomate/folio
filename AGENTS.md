@@ -100,6 +100,15 @@ its subtree to the trash; deleting is only allowed from the trash.
 
 ## Frontend gotchas
 
+- frappe-ui here uses **v2 design tokens**. A class with an old name renders
+  *nothing*, with no build error. Use `bg-surface-base` (not `surface-white`),
+  `bg-surface-elevation-2` for popups/menus (not `surface-modal`),
+  `bg-surface-sidebar` (not `surface-menu-bar`). Outline tokens are for borders/rings
+  only, never `bg-outline-*`. After a build, this lists any dead token class:
+  ```bash
+  css=$(cat folio/public/frontend/assets/*.css); grep -rhoE "(bg|text|border|ring|divide|placeholder)-(surface|ink|outline)-[a-z0-9-]+" frontend/src | sort -u | while read c; do echo "$css" | grep -q "$c" || echo "MISSING $c"; done
+  ```
+
 - One copy of ProseMirror only. `package.json` `resolutions` pins
   `prosemirror-model` / `prosemirror-view`; after adding any TipTap package run
   `find node_modules -path "*/node_modules/*/node_modules/prosemirror-*"` — it must be empty.

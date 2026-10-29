@@ -1,6 +1,6 @@
 <template>
   <div
-    class="max-h-80 w-72 overflow-y-auto rounded-lg border border-outline-gray-2 bg-surface-modal p-1 shadow-xl"
+    class="max-h-80 w-72 overflow-y-auto rounded-lg border border-outline-gray-2 bg-surface-elevation-2 p-1 shadow-xl"
     @mousedown.prevent
   >
     <template v-if="items.length">
@@ -19,7 +19,7 @@
           @click="select(index)"
         >
           <span
-            class="flex size-8 shrink-0 items-center justify-center rounded border border-outline-gray-1 bg-surface-white text-ink-gray-7"
+            class="flex size-8 shrink-0 items-center justify-center rounded border border-outline-gray-1 bg-surface-base text-ink-gray-7"
           >
             <img v-if="item.image" :src="item.image" class="size-8 rounded object-cover" alt="" />
             <span v-else-if="item.emoji" class="text-base">{{ item.emoji }}</span>

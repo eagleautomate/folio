@@ -94,6 +94,7 @@ cd apps/folio/frontend && node e2e/sidebar.mjs e2e/shots        # finished proje
 cd apps/folio/frontend && node e2e/spaces.mjs e2e/shots         # space settings dialog
 cd apps/folio/frontend && node e2e/access.mjs e2e/shots         # project pages follow ERPNext permissions (real users)
 cd apps/folio/frontend && yarn lint                             # ESLint (Vue + JS)
+cd apps/folio/frontend && node e2e/screenshots.mjs ../docs/screenshots  # refresh README screenshots (cleans up after itself)
 
 bench --site folio.localhost execute folio.demo.seed.run        # demo data (idempotent)
 bench --site folio.localhost execute folio.demo.seed.clear      # remove demo spaces/pages
@@ -195,7 +196,8 @@ its subtree to the trash; deleting is only allowed from the trash.
 1. `run-tests` is OK on `folio-test.localhost` and `folio-erp-test.localhost`.
 2. `yarn build` succeeds with no new warnings you introduced.
 3. For UI work: `yarn e2e` passes and you looked at the screenshots.
-4. `docs/features.md` describes every user-visible change you made (in user terms).
+4. `docs/features.md` describes every user-visible change you made (in user terms); if the
+   change is visible in a README screenshot, refresh the screenshots.
 5. `yarn lint` passes (catches undefined variables the build misses).
 6. `docs/roadmap.md` is updated if a roadmap item moved; `docs/decisions.md` if you
    made a design decision someone would otherwise undo.

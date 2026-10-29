@@ -85,7 +85,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { NodeViewWrapper, nodeViewProps } from '@tiptap/vue-3'
 import { Badge, LoadingIndicator, call } from 'frappe-ui'
-import { debounce } from '@/utils'
+import { debounce, formatDateRange } from '@/utils'
 
 const props = defineProps(nodeViewProps)
 
@@ -99,12 +99,7 @@ const picker = ref(null)
 const statusTheme = computed(
   () => ({ Open: 'blue', 'On hold': 'orange', Completed: 'green', Cancelled: 'gray' })[data.value?.status] || 'gray',
 )
-const dates = computed(() => {
-  const fmt = (v) => new Date(`${v}T00:00:00`).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
-  const { expected_start_date: s, expected_end_date: e } = data.value || {}
-  if (s && e) return `${fmt(s)} – ${fmt(e)}`
-  return e ? `Due ${fmt(e)}` : s ? `From ${fmt(s)}` : ''
-})
+const dates = computed(() => formatDateRange(data.value?.expected_start_date, data.value?.expected_end_date))
 
 async function load() {
   if (!props.node.attrs.project) return

@@ -4,8 +4,9 @@ Folio is a Notion/AppFlowy-style workspace (pages, docs, later databases) built 
 **native Frappe app**. It runs inside the same site as ERPNext so pages can link to
 Projects, Tasks, Timesheets and Users directly, with the same login and permissions.
 
-Read this file first, then `docs/architecture.md`. `docs/roadmap.md` says what is
-done and what is next; `docs/decisions.md` says why things are the way they are.
+Read this file first, then `docs/architecture.md`. `docs/features.md` lists what users
+can do today; `docs/roadmap.md` says what is done and what is next; `docs/decisions.md`
+says why things are the way they are.
 
 ## Ground rules
 
@@ -77,6 +78,8 @@ cd apps/folio/frontend && yarn e2e                              # browser smoke 
 cd apps/folio/frontend && node e2e/tasks.mjs e2e/shots          # ERPNext task-block browser test
 cd apps/folio/frontend && node e2e/projects.mjs e2e/shots       # project pages browser test
 cd apps/folio/frontend && node e2e/board.mjs e2e/shots          # board / table / task panel browser test
+cd apps/folio/frontend && node e2e/overview.mjs e2e/shots       # projects overview browser test
+cd apps/folio/frontend && yarn lint                             # ESLint (Vue + JS)
 
 bench --site folio.localhost execute folio.demo.seed.run        # demo data (idempotent)
 bench --site folio.localhost execute folio.demo.seed.clear      # remove demo spaces/pages
@@ -112,6 +115,8 @@ its subtree to the trash; deleting is only allowed from the trash.
   writes Folio Settings defaults on install/migrate.
 - `patches.txt` (like `apps.txt`) may lack a trailing newline: appending with `>>`
   glues your patch onto the last comment and it silently never runs.
+- Date filters treat NULL as `0001-01-01` (`ifnull(...)`): `["<", today()]` matches
+  rows with no date. Add `["field", "is", "set"]` (list-form filters) when that matters.
 - `bench execute` hides import errors as `NameError: name 'folio' is not defined`;
   run the same call through `bench console` to see the real traceback.
 - Datetimes are naive, in the system timezone (Europe/Zurich here). The SPA syncs
@@ -147,8 +152,11 @@ its subtree to the trash; deleting is only allowed from the trash.
 
 - Give every record a test creates a unique name (`Date.now()`), clean it up at the
   end, and never select by text that a leftover from an earlier run could also match.
-- Be precise with selectors: the sidebar is an `<aside>` and frappe-ui's toaster is a
-  `<section aria-label>`; use `aside[aria-label="Task details"]`, `section[data-column]`.
+- Be precise with selectors: the sidebar is an `<aside>` with draggable page rows, and
+  frappe-ui's toaster is a `<section aria-label>`; use `aside[aria-label="Task details"]`,
+  `section[data-column] [draggable]`.
+- frappe-ui `FormControl type="date"` is a custom picker, not `<input type=date>`; Folio
+  uses native date inputs (`.folio-select`) for dates.
 - HTML5 drag and drop: dispatch `DragEvent`s with a shared `DataTransfer`
   (see `e2e/board.mjs`); headless Chrome doesn't synthesise them from mouse moves.
 - The Vite build does not catch undefined variables in `<script setup>` (a missing
@@ -159,5 +167,7 @@ its subtree to the trash; deleting is only allowed from the trash.
 1. `run-tests` is OK on `folio-test.localhost` and `folio-erp-test.localhost`.
 2. `yarn build` succeeds with no new warnings you introduced.
 3. For UI work: `yarn e2e` passes and you looked at the screenshots.
-4. `docs/roadmap.md` is updated if a roadmap item moved; `docs/decisions.md` if you
+4. `docs/features.md` describes every user-visible change you made (in user terms).
+5. `yarn lint` passes (catches undefined variables the build misses).
+6. `docs/roadmap.md` is updated if a roadmap item moved; `docs/decisions.md` if you
    made a design decision someone would otherwise undo.

@@ -84,7 +84,7 @@ function sortBy(key) {
 const rank = {
   status: (t) => (t.status === 'Overdue' ? -1 : TASK_STATUSES.indexOf(t.status)),
   priority: (t) => TASK_PRIORITIES.indexOf(t.priority || 'Medium'),
-  assignee: (t) => t.assignees[0]?.full_name?.toLowerCase() || '￿',
+  assignee: (t) => t.assignees[0]?.full_name?.toLowerCase() || '\uffff',
   due: (t) => t.due || '9999',
   subject: (t) => t.subject.toLowerCase(),
   name: (t) => t.name,

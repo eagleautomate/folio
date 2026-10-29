@@ -1,5 +1,7 @@
 # Folio roadmap
 
+Shipped features are listed for users in [features.md](features.md).
+
 Status keys: `[x]` done and verified · `[ ]` not started · `[~]` partly done.
 Each step ships on its own and is verified (tests + build + browser check) before the next.
 
@@ -35,7 +37,7 @@ Each step ships on its own and is verified (tests + build + browser check) befor
 - [x] Auto page per Project, always in the Projects space: renamed with it, trashed on delete, backfill button
 - [x] Project page layout: live header (status switch, progress, dates, priority, customer, team) + Overview / Tasks tabs; `/task` scoped to the project; `/project` card only on ordinary pages
 - [x] Tasks tab views: List, Board (Kanban, group by status / assignee / priority, drag to change) and Table (sortable); task side panel (title, status, assignees, priority, dates, description)
-- [ ] Projects overview on the Projects space: table + board of all projects, filters, "New project"
+- [x] Projects overview (`/folio/projects`, "All projects" in the sidebar): table + board by status (drag to change), active/completed/all, search, "My projects", New project
 - [ ] Sidebar shows active projects only
 - [ ] Timesheet timer on task blocks + weekly timesheet grid
 

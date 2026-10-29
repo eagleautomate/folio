@@ -68,6 +68,8 @@ def get_boot() -> dict:
 		# Datetimes are stored in the system timezone without an offset; the client
 		# compares against this to show correct relative times in any browser timezone.
 		"server_now": str(now_datetime()),
+		# the space holding project pages, so the sidebar can show "All projects"
+		"projects_space": frappe.db.get_single_value("Folio Settings", "projects_space"),
 	}
 
 

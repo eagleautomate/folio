@@ -76,3 +76,16 @@ export const EMOJIS = (
   '👋 👥 🧑‍💻 🧠 💬 📣 📞 ✉️ 🔔 ❤️ 💚 💙 💜 🧡 💛 🟢 🟡 🔴 🔵 🟣 ⚪ ⚫ 🧪 ' +
   '🐞 🧩 🎨 🖌️ 📷 🎬 🎵 ☕ 🍕 🌱 🌳 🌊 ☀️ 🌙 ⚡ 🏆 🥇 📍 🧱 🗒️ 📋 🔍 🧷'
 ).split(' ')
+
+// "9 Oct – 8 Dec" (year only when it isn't the current one). Dates are 'YYYY-MM-DD'.
+export function formatDateRange(start, end) {
+  const thisYear = new Date().getFullYear()
+  const fmt = (v) => {
+    const d = new Date(`${String(v).slice(0, 10)}T00:00:00`)
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', ...(d.getFullYear() !== thisYear && { year: 'numeric' }) })
+  }
+  if (start && end) return `${fmt(start)} – ${fmt(end)}`
+  if (end) return `Due ${fmt(end)}`
+  if (start) return `From ${fmt(start)}`
+  return ''
+}

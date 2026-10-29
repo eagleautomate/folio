@@ -105,3 +105,153 @@ def search_projects(query: str | None = None, limit: int = 10) -> list[dict]:
 		order_by="modified desc",
 		limit=min(cint(limit) or 10, 30),
 	)
+
+
+ACTIVE = ("Open", "On hold")
+
+
+@frappe.whitelist()
+def list_projects(scope: str = "active", mine: int = 0, query: str | None = None) -> list[dict]:
+	"""Every project the user can see, with task counts and its Folio page (projects overview).
+
+	``scope``: ``active`` (Open + On hold), ``completed`` (Completed + Cancelled) or ``all``.
+	``mine``: only projects where the user is a project member, has a task, or created it.
+	"""
+	require_erpnext()
+	filters = {}
+	if scope == "active":
+		filters["status"] = ["in", ACTIVE]
+	elif scope == "completed":
+		filters["status"] = ["in", ("Completed", "Cancelled")]
+	if query:
+		filters["project_name"] = ["like", f"%{query}%"]
+
+	projects = frappe.get_list(  # ERPNext permissions
+		"Project", filters=filters, fields=PROJECT_FIELDS + ["owner", "modified"], order_by="modified desc", limit=500
+	)
+	if not projects:
+		return []
+	names = [p.name for p in projects]
+
+	counts = {n: {"total": 0, "open": 0, "completed": 0, "overdue": 0} for n in names}
+	for row in frappe.get_list(
+		"Task",
+		filters={"project": ["in", names], "status": ["!=", "Template"]},
+		fields=["project", "status", {"COUNT": "*", "as": "n"}],
+		group_by="project, status",
+	):
+		c = counts[row.project]
+		c["total"] += row.n
+		c["completed" if row.status in ("Completed", "Cancelled") else "open"] += row.n
+		if row.status == "Overdue":
+			c["overdue"] += row.n
+	# late but not yet flagged by ERPNext's daily job
+	for row in frappe.get_list(
+		"Task",
+		# list form: two conditions on exp_end_date. Without "is set", Frappe compares
+		# ifnull(exp_end_date, '0001-01-01') and every task without a due date looks late.
+		filters=[
+			["project", "in", names],
+			["status", "not in", ("Completed", "Cancelled", "Template", "Overdue")],
+			["exp_end_date", "is", "set"],
+			["exp_end_date", "<", today()],
+		],
+		fields=["project", {"COUNT": "*", "as": "n"}],
+		group_by="project",
+	):
+		counts[row.project]["overdue"] += row.n
+
+	# team = project members, then anyone with an open assignment on one of its tasks
+	members = {}
+	for row in frappe.get_all(
+		"Project User", filters={"parent": ["in", names], "parenttype": "Project"}, fields=["parent", "user"]
+	):
+		members.setdefault(row.parent, []).append(row.user)
+	task_project = dict(
+		frappe.get_all("Task", filters={"project": ["in", names]}, fields=["name", "project"], as_list=True)
+	)
+	if task_project:
+		for row in frappe.get_all(
+			"ToDo",
+			filters={"reference_type": "Task", "reference_name": ["in", list(task_project)], "status": "Open"},
+			fields=["reference_name", "allocated_to"],
+		):
+			team = members.setdefault(task_project[row.reference_name], [])
+			if row.allocated_to not in team:
+				team.append(row.allocated_to)
+	pages = dict(
+		frappe.get_all(
+			"Folio Page",
+			filters={"project": ["in", names], "is_project_page": 1, "is_archived": 0},
+			fields=["project", "name"],
+			as_list=True,
+		)
+	)
+
+	me = frappe.session.user
+	mine_set = None
+	if cint(mine):
+		assigned = set(
+			frappe.get_all(
+				"ToDo",
+				filters={"reference_type": "Task", "allocated_to": me, "status": ["!=", "Cancelled"]},
+				pluck="reference_name",
+			)
+		)
+		task_projects = (
+			set(frappe.get_all("Task", filters={"name": ["in", list(assigned)]}, pluck="project")) if assigned else set()
+		)
+		mine_set = {p.name for p in projects if p.owner == me or me in members.get(p.name, []) or p.name in task_projects}
+
+	result = []
+	for p in projects:
+		if mine_set is not None and p.name not in mine_set:
+			continue
+		result.append(
+			{
+				**p,
+				"counts": counts[p.name],
+				"team": [user_info(u) for u in members.get(p.name, [])],
+				"page": pages.get(p.name),
+				"can_edit": bool(frappe.has_permission("Project", "write", p.name)),
+			}
+		)
+	return result
+
+
+@frappe.whitelist(methods=["POST"])
+def create_project(
+	project_name: str,
+	expected_start_date: str | None = None,
+	expected_end_date: str | None = None,
+	priority: str | None = None,
+) -> dict:
+	"""Create an ERPNext Project from Folio; its page is made by the Project hook."""
+	require_erpnext()
+	project_name = (project_name or "").strip()
+	if not project_name:
+		frappe.throw(frappe._("Give the project a name"))
+	company = frappe.defaults.get_user_default("Company") or frappe.db.get_single_value(
+		"Global Defaults", "default_company"
+	) or frappe.db.get_value("Company", {}, "name")
+	project = frappe.get_doc(
+		{
+			"doctype": "Project",
+			"project_name": project_name,
+			"company": company,
+			"status": "Open",
+			"expected_start_date": expected_start_date or None,
+			"expected_end_date": expected_end_date or None,
+			"priority": priority or "Medium",
+		}
+	)
+	project.insert()  # ERPNext permissions: needs create on Project
+	from folio.projects import create_project_page
+
+	page = create_project_page(project)  # normally done by the hook already; returns it
+	return {"project": project.name, "page": page}
+
+
+@frappe.whitelist()
+def can_create_project() -> bool:
+	return "erpnext" in frappe.get_installed_apps() and bool(frappe.has_permission("Project", "create"))

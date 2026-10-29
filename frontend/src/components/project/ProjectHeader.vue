@@ -51,23 +51,14 @@
 <script setup>
 import { computed } from 'vue'
 import { Avatar, Badge, Dropdown, LoadingIndicator, call, toast } from 'frappe-ui'
+import { formatDateRange } from '@/utils'
 
 const props = defineProps({ project: { type: Object, default: null } })
 const emit = defineEmits(['updated'])
 
 const pct = computed(() => Math.round(Math.min(100, props.project?.percent_complete || 0)))
 
-const dates = computed(() => {
-  const thisYear = new Date().getFullYear()
-  const fmt = (v) => {
-    const d = new Date(`${v}T00:00:00`)
-    const opts = { day: 'numeric', month: 'short', ...(d.getFullYear() !== thisYear && { year: 'numeric' }) }
-    return d.toLocaleDateString(undefined, opts)
-  }
-  const { expected_start_date: s, expected_end_date: e } = props.project || {}
-  if (s && e) return `${fmt(s)} – ${fmt(e)}`
-  return e ? `Due ${fmt(e)}` : s ? `From ${fmt(s)}` : ''
-})
+const dates = computed(() => formatDateRange(props.project?.expected_start_date, props.project?.expected_end_date))
 
 const statusOptions = computed(() =>
   ['Open', 'On hold', 'Completed', 'Cancelled'].map((status) => ({

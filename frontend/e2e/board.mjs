@@ -25,7 +25,7 @@ const task = () => api('frappe.client.get_value', { doctype: 'Task', filters: { 
 const columns = () => page.$$eval('section[data-column]', (els) => els.map((e) => `${e.getAttribute('aria-label')}:${e.querySelectorAll('[draggable]').length}`))
 async function drag(columnLabel) {
   await page.evaluate((subject, label) => {
-    const card = [...document.querySelectorAll('[draggable="true"]')].find((c) => c.innerText.includes(subject))
+    const card = [...document.querySelectorAll('section[data-column] [draggable="true"]')].find((c) => c.innerText.includes(subject))
     const col = document.querySelector(`section[data-column][aria-label="${label}"]`)
     const dt = new DataTransfer()
     card.dispatchEvent(new DragEvent('dragstart', { bubbles: true, dataTransfer: dt }))

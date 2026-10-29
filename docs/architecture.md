@@ -133,6 +133,12 @@ ERPNext is optional. `folio.api.tasks.erpnext_enabled()` decides; the SPA reads
   - Page.vue goes full width while a board/table is shown.
   - The panel caps dates at the project's end date (ERPNext rejects later ones) and
     shows ERPNext's own message if a save is refused, then reloads the server value.
+- **Projects overview** (`pages/Projects.vue`, route `/projects`, linked from the projects
+  space in the sidebar via `get_boot().projects_space`): `projects.list_projects` returns
+  every readable Project with grouped task counts (one `get_list` with COUNT/group by),
+  overdue (status Overdue, or late but not yet flagged), team (members + open
+  assignees) and its page. Board drag calls `set_status`. `create_project` inserts the
+  Project with ERPNext permissions; the hook makes its page.
 - Backfill: Folio Settings → "Create pages for existing projects".
 - Patch `v0_1.project_page_layout` migrated older pages (removed the embedded
   project block, moved pages into the projects space).

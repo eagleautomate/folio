@@ -72,6 +72,17 @@
           </button>
         </div>
         <template v-if="!collapsed[space.name]">
+          <!-- the projects space opens with its overview of all projects -->
+          <div
+            v-if="space.name === state.boot?.projects_space"
+            class="flex h-7 cursor-pointer items-center gap-2 rounded px-1 text-base text-ink-gray-7 hover:bg-surface-gray-2"
+            :class="{ '!bg-surface-gray-3 font-medium text-ink-gray-9': $route.name === 'Projects' }"
+            style="padding-left: 4px"
+            @click="$router.push({ name: 'Projects' })"
+          >
+            <span class="flex size-5 items-center justify-center"><LucideLayoutGrid class="size-4 text-ink-gray-5" /></span>
+            All projects
+          </div>
           <PageTreeItem v-for="page in childrenOf(space.name)" :key="page.name" :page="page" />
           <button
             v-if="!childrenOf(space.name).length && canEditSpace(space.name)"

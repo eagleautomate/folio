@@ -44,7 +44,7 @@ await page.keyboard.press('Enter')
 await page.keyboard.type('/head')
 try {
   await page.waitForSelector('xpath/.//button[.//span[text()="Heading 2"]]', { timeout: 4000 })
-} catch (e) {
+} catch {
   await page.screenshot({ path: `${out}/fail.png` })
   console.log('active:', await page.evaluate(() => document.activeElement?.className + ' | ' + document.querySelector('.folio-prose')?.innerHTML.slice(0, 300)))
   console.log('console errors:', errors)

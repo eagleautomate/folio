@@ -172,3 +172,51 @@ class TestProjectPages(IntegrationTestCase):
 		self.assertEqual(data["counts"], {"total": 3, "completed": 1, "overdue": 0, "open": 2})
 		self.assertEqual([t["status"] for t in data["tasks"]][-1], "Completed")  # open tasks first
 		self.assertTrue(project_api.get_project("PROJ-NOPE")["missing"])
+
+	def test_list_projects_counts_scope_and_mine(self):
+		user = "folio-proj-member@folio.test"
+		from folio.tests.test_folio import make_user
+
+		make_user(user, roles=("Folio User", "Projects User"))
+		active = self.make_project()
+		done = self.make_project()
+		done.status = "Completed"
+		done.save()
+		for subject, status, due in [("a", "Open", "2020-01-01"), ("b", "Completed", None), ("c", "Working", None)]:
+			t = frappe.get_doc({"doctype": "Task", "subject": subject, "project": active.name, "exp_end_date": due}).insert()
+			if status != "Open":
+				t.status = status
+				t.save()
+
+		rows = {p["name"]: p for p in project_api.list_projects("active")}
+		self.assertIn(active.name, rows)
+		self.assertNotIn(done.name, rows)
+		self.assertEqual(rows[active.name]["counts"], {"total": 3, "open": 2, "completed": 1, "overdue": 1})
+		self.assertEqual(rows[active.name]["page"], projects.get_project_page(active.name))
+		self.assertIn(done.name, [p["name"] for p in project_api.list_projects("completed")])
+		self.assertEqual({active.name, done.name} - {p["name"] for p in project_api.list_projects("all")}, set())
+
+		# "mine": member of the project's Users table
+		proj = frappe.get_doc("Project", active.name)
+		proj.append("users", {"user": user, "welcome_email_sent": 1})  # no mail server on the test site
+		proj.save()
+		frappe.set_user(user)
+		mine = [p["name"] for p in project_api.list_projects("all", mine=1)]
+		self.assertIn(active.name, mine)
+		self.assertNotIn(done.name, mine)
+
+	def test_create_project_from_folio(self):
+		result = project_api.create_project("Made in Folio", "2026-11-01", "2026-12-31", "High")
+		project = frappe.get_doc("Project", result["project"])
+		self.assertEqual((project.project_name, project.priority, str(project.expected_end_date)), ("Made in Folio", "High", "2026-12-31"))
+		self.assertEqual(result["page"], projects.get_project_page(project.name))
+		self.assertRaises(frappe.ValidationError, project_api.create_project, "   ")
+
+	def test_create_project_needs_erpnext_permission(self):
+		from folio.tests.test_folio import make_user
+
+		make_user("folio-no-projects@folio.test", roles=("Folio User",))
+		frappe.set_user("folio-no-projects@folio.test")
+		self.assertFalse(project_api.can_create_project())
+		self.assertRaises(frappe.PermissionError, project_api.create_project, "Nope")
+

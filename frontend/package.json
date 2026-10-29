@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build --base=/assets/folio/frontend/",
     "test": "vitest run",
-    "e2e": "mkdir -p e2e/shots && node e2e/smoke.mjs e2e/shots"
+    "e2e": "mkdir -p e2e/shots && node e2e/smoke.mjs e2e/shots",
+    "lint": "eslint src e2e"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.6.0",
@@ -44,6 +45,9 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.14",
+    "eslint": "^9.17.0",
+    "eslint-plugin-vue": "^9.32.0",
+    "globals": "^15.14.0",
     "happy-dom": "^20.9.0",
     "postcss": "^8.4.5",
     "puppeteer-core": "^23",

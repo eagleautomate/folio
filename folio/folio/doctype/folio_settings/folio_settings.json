@@ -22,10 +22,10 @@
    "label": "Create a page for every new Project"
   },
   {
-   "description": "Used when no space is linked to the project. Left empty, Folio creates a \"Projects\" space the first time it needs one.",
+   "description": "Every project page lives here. Left empty, Folio creates a \"Projects\" space the first time it needs one.",
    "fieldname": "projects_space",
    "fieldtype": "Link",
-   "label": "Default space for project pages",
+   "label": "Space for project pages",
    "options": "Folio Space"
   },
   {
@@ -36,7 +36,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2026-10-29 14:00:00.000000",
+ "modified": "2026-10-29 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "Folio",
  "name": "Folio Settings",

@@ -1,6 +1,6 @@
-// ERPNext Project block: live summary of a project and its task list. Inserted at
-// the top of every auto-created project page, or with "/project". Stores only the
-// Project name; everything else is read live (folio.api.projects.get_project).
+// ERPNext Project card ("/project" on ordinary pages): live status, progress and
+// task counts, linking to the project's page, which owns the task list. Hidden on
+// project pages. Stores only the Project name; the rest is read live.
 import { Node, mergeAttributes } from '@tiptap/core'
 import { VueNodeViewRenderer } from '@tiptap/vue-3'
 import ProjectBlockView from './ProjectBlockView.vue'

@@ -2,13 +2,24 @@
 
 Short records of choices that someone might otherwise undo. Newest first.
 
-## 2026-10-29 — Project pages: one per project, never blocking ERPNext
+## 2026-10-29 — Project pages are structured, and own the project's task list
 
-Created from `doc_events` in a savepoint, errors only logged: a Folio problem must
-never stop someone saving a Project. The page goes to the project's own space if one
-is linked (and follows the link if it's added later), otherwise a shared "Projects"
-space, so project pages are easy to find without one space per project. A renamed
-project renames its page only if nobody re-titled the page.
+A project page has a fixed live header and an Overview / Tasks layout rendered by the
+app; only the Overview is free-form. Reason: with a free "project block", users could
+embed other projects or keep a second task list with `/task`, and nothing said which
+list was real. Now each project has exactly one task list (its ERPNext Tasks, in the
+Tasks tab); task blocks in the Overview are references to that project's tasks only.
+
+## 2026-10-29 — All project pages live in the Projects space
+
+One predictable home for every project (user decision). Linking a team space to a
+project no longer moves the page. Project page creation runs in a savepoint and only
+logs errors, so a Folio problem never stops someone saving a Project.
+
+## 2026-10-29 — Task board groups by status, switchable to assignee / priority
+
+User decision. Overdue is set by ERPNext's scheduler, so it is a flag on the card,
+not a column you can drop into.
 
 ## 2026-10-29 — ERPNext stays optional; ERPNext data obeys ERPNext permissions
 

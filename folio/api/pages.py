@@ -31,6 +31,7 @@ PAGE_FIELDS = [
 	"is_locked",
 	"is_archived",
 	"project",
+	"is_project_page",
 	"content_version",
 	"last_edited_by",
 	"last_edited_on",
@@ -208,6 +209,8 @@ def move_page(name: str, space: str, parent_page: str | None = None, index: int 
 	index = max(0, cint(index))
 
 	doc = frappe.get_doc("Folio Page", name)
+	if doc.is_project_page and space != doc.space:
+		frappe.throw(_("Project pages stay in the projects space"))
 	if parent_page and (parent_page == name or parent_page in get_descendants(name)):
 		frappe.throw(_("A page cannot be moved inside itself"))
 

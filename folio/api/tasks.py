@@ -63,6 +63,12 @@ def default_project(page: str) -> str | None:
 	return project or frappe.db.get_value("Folio Space", space, "project")
 
 
+def locked_project(page: str) -> str | None:
+	"""On a project page, every task belongs to that page's project."""
+	project, is_project_page = frappe.db.get_value("Folio Page", page, ["project", "is_project_page"])
+	return project if is_project_page else None
+
+
 @frappe.whitelist()
 def get_tasks(names: str | list) -> dict:
 	"""Live data for the task blocks on a page, keyed by Task name.
@@ -96,6 +102,10 @@ def create_task(page: str, subject: str, project: str | None = None) -> dict:
 	subject = (subject or "").strip()
 	if not subject:
 		frappe.throw(_("Give the task a title"))
+	locked = locked_project(page)
+	if locked and project and project != locked:
+		frappe.throw(_("Tasks on this page belong to project {0}").format(locked))
+	project = project or locked
 	if project and not frappe.has_permission("Project", "read", project):
 		frappe.throw(_("You do not have access to project {0}").format(project), frappe.PermissionError)
 
@@ -133,7 +143,10 @@ def search_tasks(page: str, query: str | None = None, limit: int = 8) -> list[di
 	filters = {"status": ["not in", ["Template"]]}
 	if query:
 		filters["subject"] = ["like", f"%{query}%"]
-	project = default_project(page)
+	locked = locked_project(page)
+	if locked:
+		filters["project"] = locked  # a project page only references its own tasks
+	project = locked or default_project(page)
 	rows = frappe.get_list(  # get_list applies ERPNext's permission rules
 		"Task",
 		filters=filters,

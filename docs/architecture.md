@@ -105,19 +105,25 @@ ERPNext is optional. `folio.api.tasks.erpnext_enabled()` decides; the SPA reads
 
 **Project pages** (`folio/projects.py`, hooked via `doc_events["Project"]`):
 
-- `after_insert` creates one page per Project (`is_project_page = 1`, `project` set,
-  template = project block + "Notes"). Space: a space linked to the project, else
-  Folio Settings → `projects_space`, else a "Projects" space created on first use.
-- Linking a space to a project later (`FolioSpace.adopt_project_page`) moves the
-  page and its sub-pages into that space.
+- One page per Project (`is_project_page = 1`, `project` set), **always in the projects
+  space** (Folio Settings → `projects_space`, else a "Projects" space made on first
+  use). `move_page` refuses to move a project page to another space. Team spaces may
+  still link a project (their `/task` defaults to it) but never host its page.
+- The page body is only the project's **Overview** (free-form editor). `Page.vue` wraps
+  project pages in `ProjectPage.vue`: live `ProjectHeader` (status switch via
+  `projects.set_status`, progress, dates, priority, customer, team) and tabs
+  **Overview** | **Tasks** (`?tab=tasks`). The editor stays mounted (`v-show`) so
+  autosave/undo survive tab switches. One `useProject()` load feeds header and tabs.
+- **One task list per project:** the Tasks tab lists the project's ERPNext Tasks.
+  On a project page `/task` can only create or link tasks of *that* project
+  (`tasks.locked_project`); `/project` is hidden (`hiddenOn: 'projectPage'`).
+  Elsewhere `/project` inserts a read-only card (counts + "Open project page").
 - `on_update`: a renamed project renames its page if the title still matched.
   `on_trash`: page to trash, links cleared; `ignore_links_on_delete` lets the delete through.
 - Runs in a savepoint; any error is logged (Error Log) and never blocks ERPNext.
-- Backfill: Folio Settings → "Create pages for existing projects"
-  (`create_missing_project_pages`, managers only).
-- The `erpnextProject` block (`ProjectBlockView.vue`, `folio.api.projects.get_project`)
-  shows status, % complete, dates, counts and the task list via `frappe.get_list`
-  (ERPNext permissions); tasks render with the shared `TaskRow.vue`.
+- Backfill: Folio Settings → "Create pages for existing projects".
+- Patch `v0_1.project_page_layout` migrated older pages (removed the embedded
+  project block, moved pages into the projects space).
 
 Still planned: record mentions, linked database views over Task/Project/Timesheet,
 timesheet timer. Linked views must read through `frappe.get_list`.

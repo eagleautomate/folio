@@ -30,22 +30,6 @@ class FolioSpace(Document):
 
 	def on_update(self):
 		clear_access_cache()
-		if self.project and self.has_value_changed("project"):
-			self.adopt_project_page()
-
-	def adopt_project_page(self):
-		"""Linking a space to a project moves that project's page (and sub-pages) here."""
-		from folio.projects import get_project_page
-		from folio.utils import next_sort_order
-
-		page = get_project_page(self.project)
-		if not page or frappe.db.get_value("Folio Page", page, "space") == self.name:
-			return
-		doc = frappe.get_doc("Folio Page", page)
-		doc.space = self.name
-		doc.parent_page = None
-		doc.sort_order = next_sort_order("Folio Page", {"space": self.name, "parent_page": ("is", "not set")})
-		doc.save(ignore_permissions=True)  # FolioPage.on_update moves the subtree
 
 	def on_trash(self):
 		for page in frappe.get_all(

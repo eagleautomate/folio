@@ -27,7 +27,6 @@ from folio.content import (
 	page_link,
 	quote,
 	table,
-	task,
 	text,
 	todos,
 )
@@ -62,6 +61,10 @@ def run():
 	projects = make_projects_and_tasks(users) if has_erpnext else {}
 	make_spaces_and_pages(users, projects)
 
+	if has_erpnext:
+		from folio.projects import create_missing_project_pages
+
+		create_missing_project_pages()
 	frappe.db.set_default(MARKER, "1")
 	frappe.db.commit()
 	print(f"Folio demo ready. Log in as {users['anna']} / {DEMO_PASSWORD} (or Administrator).")
@@ -514,32 +517,6 @@ def make_spaces_and_pages(users, projects):
 			table(["Section", "Pages", "Action"], ["Blog", "48", "Keep, re-tag"], ["Products", "12", "Rewrite"], ["Legacy news", "30", "Drop + redirect"]),
 		),
 	)
-	relaunch_tasks = [
-		task(t.name, t.subject)
-		for t in frappe.get_all(
-			"Task",
-			filters={"project": projects.get("Website Relaunch") or "__none__"},
-			fields=["name", "subject"],
-			order_by="exp_start_date asc",
-		)
-	]
-	if relaunch_tasks:
-		get_or_create_page(
-			launch,
-			"Relaunch task board",
-			icon="🗂️",
-			owner=sophie,
-			content=doc(
-				callout(
-					"🔗",
-					"These are live ERPNext tasks. Tick one here and it's completed in ERPNext; type ",
-					text("/task", "code"),
-					" to add another.",
-				),
-				h(2, "This project's tasks"),
-				*relaunch_tasks,
-			),
-		)
 	get_or_create_page(
 		launch,
 		"Launch checklist",

@@ -41,7 +41,7 @@
           <span v-if="!opt.create" class="shrink-0 text-xs text-ink-gray-5">{{ opt.name }} · {{ opt.status }}</span>
         </button>
       </div>
-      <p v-if="error" class="mt-1 text-sm text-ink-red-4">{{ error }}</p>
+      <p v-if="error" class="mt-1 text-sm text-ink-red-6">{{ error }}</p>
     </div>
 
     <!-- linked task -->

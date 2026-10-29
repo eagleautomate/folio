@@ -14,7 +14,7 @@ from frappe.tests import IntegrationTestCase
 
 from folio import projects
 from folio.api import projects as project_api
-from folio.api import spaces
+from folio.api import pages, spaces, tasks
 from folio.permissions import clear_access_cache
 
 
@@ -58,8 +58,9 @@ class TestProjectPages(IntegrationTestCase):
 		self.assertEqual(page.title, "Warehouse move")
 		self.assertTrue(page.is_project_page)
 		self.assertEqual(frappe.db.get_value("Folio Space", page.space, "title"), projects.PROJECTS_SPACE_TITLE)
+		# the body is the free-form Overview; header and Tasks tab come from the app
 		blocks = json.loads(page.content)["content"]
-		self.assertEqual(blocks[0], {"type": "erpnextProject", "attrs": {"project": project.name}})
+		self.assertNotIn("erpnextProject", [b["type"] for b in blocks])
 		# the Projects space is remembered in settings and reused
 		self.assertEqual(frappe.db.get_single_value("Folio Settings", "projects_space"), page.space)
 		self.assertEqual(self.page_of(self.make_project().name).space, page.space)
@@ -70,29 +71,65 @@ class TestProjectPages(IntegrationTestCase):
 		frappe.clear_document_cache("Folio Settings", "Folio Settings")
 		self.assertEqual(self.page_of(self.make_project().name).space, space)
 
-	def test_linked_space_wins_when_backfilling(self):
+	def test_backfill_always_uses_projects_space(self):
 		frappe.db.set_single_value("Folio Settings", "auto_create_project_pages", 0)
 		frappe.clear_document_cache("Folio Settings", "Folio Settings")
 		project = self.make_project()
 		self.assertIsNone(self.page_of(project.name))  # auto-create off
 
-		space = spaces.create_space(title="Linked")["name"]
-		spaces.update_space(space, project=project.name)
+		team_space = spaces.create_space(title="Linked team")["name"]
+		spaces.update_space(team_space, project=project.name)  # linking doesn't move anything
 		self.assertGreaterEqual(projects.create_missing_project_pages()["created"], 1)
-		self.assertEqual(self.page_of(project.name).space, space)
+		self.assertEqual(self.page_of(project.name).space, projects.projects_space())
 		# idempotent
 		self.assertEqual(projects.create_project_page(project.name), self.page_of(project.name).name)
 
-	def test_linking_a_space_moves_the_project_page(self):
+	def test_project_page_stays_in_projects_space(self):
 		project = self.make_project()
+		page = self.page_of(project.name)
+		other = spaces.create_space(title="Elsewhere")["name"]
+		self.assertRaises(frappe.ValidationError, pages.move_page, page.name, other, None, 0)
+		pages.move_page(page.name, page.space, None, 0)  # reordering inside is fine
+
+	def test_tasks_on_a_project_page_belong_to_that_project(self):
+		project = self.make_project()
+		other = self.make_project()
 		page = projects.get_project_page(project.name)
-		child = frappe.get_doc(
-			{"doctype": "Folio Page", "space": self.page_of(project.name).space, "parent_page": page, "title": "Minutes"}
-		).insert()
-		space = spaces.create_space(title="Project team")["name"]
-		spaces.update_space(space, project=project.name)
-		self.assertEqual(frappe.db.get_value("Folio Page", page, ["space", "parent_page"]), (space, None))
-		self.assertEqual(frappe.db.get_value("Folio Page", child.name, "space"), space)
+		elsewhere = frappe.get_doc({"doctype": "Task", "subject": "Unrelated zebra", "project": other.name}).insert()
+
+		self.assertEqual(tasks.create_task(page, "Zebra one")["project"], project.name)
+		self.assertRaises(frappe.ValidationError, tasks.create_task, page, "Wrong", other.name)
+		found = [t["name"] for t in tasks.search_tasks(page, "zebra")]
+		self.assertNotIn(elsewhere.name, found)
+		self.assertEqual(len(found), 1)
+
+	def test_status_change_from_header(self):
+		project = self.make_project()
+		self.assertEqual(project_api.set_status(project.name, "On hold")["status"], "On hold")
+		self.assertRaises(frappe.ValidationError, project_api.set_status, project.name, "Bogus")
+		data = project_api.get_project(project.name)
+		self.assertEqual(data["page"], projects.get_project_page(project.name))
+
+	def test_patch_cleans_up_old_project_pages(self):
+		from folio.patches.v0_1 import project_page_layout
+
+		project = self.make_project()
+		name = projects.get_project_page(project.name)
+		old_space = spaces.create_space(title="Old home")["name"]
+		frappe.db.set_value(
+			"Folio Page",
+			name,
+			{
+				"space": old_space,
+				"content": json.dumps(
+					{"type": "doc", "content": [{"type": "erpnextProject", "attrs": {"project": project.name}}]}
+				),
+			},
+		)
+		project_page_layout.execute()
+		page = frappe.get_doc("Folio Page", name)
+		self.assertEqual(page.space, projects.projects_space())
+		self.assertEqual(json.loads(page.content)["content"], [{"type": "paragraph"}])
 
 	def test_rename_follows_unless_page_was_retitled(self):
 		project = self.make_project("Old name")

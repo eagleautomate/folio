@@ -6,9 +6,11 @@
 Wired in hooks.py (``doc_events["Project"]``); the events simply never fire on sites
 without ERPNext.
 
-* A new Project gets a page (``is_project_page = 1``) in the space linked to that
-  project, else in the default projects space (Folio Settings), else in a "Projects"
-  space created on first use.
+* A new Project gets a page (``is_project_page = 1``) in the projects space: the one
+  chosen in Folio Settings, else a "Projects" space created on first use. Project pages
+  always live there, so every project has one predictable home.
+* The page body is the project's free-form Overview; the SPA adds the live header and
+  the Tasks tab around it (see ``Page.vue`` / ``ProjectHeader.vue``).
 * Renaming the project renames the page, unless someone gave the page another title.
 * Deleting the project moves its page to the trash and clears dangling links
   (``ignore_links_on_delete`` in hooks.py lets the delete go through).
@@ -28,12 +30,9 @@ from folio.utils import next_sort_order
 PROJECTS_SPACE_TITLE = "Projects"
 
 
-def project_block(project: str) -> dict:
-	return {"type": "erpnextProject", "attrs": {"project": project}}
-
-
 def page_template(project: str) -> dict:
-	return doc(project_block(project), h(2, "Notes"), p())
+	"""Starting Overview for a new project page."""
+	return doc(h(2, "Goals"), p(), h(2, "Notes"), p())
 
 
 def settings():
@@ -44,13 +43,8 @@ def get_project_page(project: str) -> str | None:
 	return frappe.db.get_value("Folio Page", {"project": project, "is_project_page": 1})
 
 
-def space_for_project(project: str) -> str:
-	linked = frappe.get_all(
-		"Folio Space", filters={"project": project}, order_by="creation asc", limit=1, pluck="name"
-	)
-	if linked:
-		return linked[0]
-
+def projects_space() -> str:
+	"""The space that holds every project page (created on first use)."""
 	configured = settings().projects_space
 	if configured and frappe.db.exists("Folio Space", configured):
 		return configured
@@ -85,7 +79,7 @@ def create_project_page(project) -> str:
 	if existing:
 		return existing
 
-	space = space_for_project(project.name)
+	space = projects_space()
 	page = frappe.get_doc(
 		{
 			"doctype": "Folio Page",

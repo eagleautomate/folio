@@ -100,15 +100,22 @@
           />
         </div>
 
-        <Editor
-          ref="editorRef"
-          class="mt-3"
-          :page-name="name"
-          :content="doc.content"
-          :editable="doc.can_edit"
-          @update="onContentUpdate"
-          @create-sub-page="createSubPage"
-        />
+        <!-- project pages wrap the editor (their Overview) in a live header + tabs -->
+        <component
+          :is="isProjectPage ? ProjectPage : 'div'"
+          v-bind="isProjectPage ? { projectName: doc.project, pageName: name, editable: doc.can_edit } : {}"
+        >
+          <Editor
+            ref="editorRef"
+            class="mt-3"
+            :page-name="name"
+            :project-page="isProjectPage ? doc.project : null"
+            :content="doc.content"
+            :editable="doc.can_edit"
+            @update="onContentUpdate"
+            @create-sub-page="createSubPage"
+          />
+        </component>
       </div>
     </div>
 
@@ -121,6 +128,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, onBeforeRouteUpdate, useRouter } from 'vue-router'
 import { Button, Dropdown, LoadingIndicator, call, createResource, toast } from 'frappe-ui'
 import Editor from '@/components/editor/Editor.vue'
+import ProjectPage from '@/components/project/ProjectPage.vue'
 import EmojiPicker from '@/components/EmojiPicker.vue'
 import VersionHistory from '@/components/VersionHistory.vue'
 import {
@@ -167,6 +175,7 @@ const breadcrumbs = computed(() => [
   ...(doc.value?.breadcrumbs || []),
   ...(doc.value ? [{ name: props.name, title: title.value, icon: doc.value.icon }] : []),
 ])
+const isProjectPage = computed(() => !!(doc.value?.is_project_page && doc.value?.project))
 const isFavorite = computed(() => state.favorites.includes(props.name))
 const canEditAccess = computed(() => ['edit', 'full'].includes(doc.value?.access))
 const coverStyle = computed(() => {

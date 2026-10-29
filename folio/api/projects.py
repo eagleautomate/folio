@@ -1,13 +1,20 @@
 # Copyright (c) 2026, Eagle Automate and contributors
 # For license information, please see license.txt
 
-"""Live data for project blocks. Same rules as task blocks: ERPNext permissions apply."""
+"""Live project data for project page headers, Tasks tabs and project cards.
+
+Same rules as task blocks: ERPNext permissions apply.
+"""
+
+import json
 
 import frappe
 from frappe.utils import cint, getdate, today
 
 from folio.api.tasks import FIELDS as TASK_FIELDS
-from folio.api.tasks import require_erpnext, serialize
+from folio.api.tasks import require_erpnext, serialize, user_info
+
+STATUSES = ("Open", "On hold", "Completed", "Cancelled")
 
 PROJECT_FIELDS = [
 	"name",
@@ -49,12 +56,42 @@ def get_project(name: str, limit: int = 100) -> dict:
 			if t.status == "Overdue" or (t.exp_end_date and getdate(t.exp_end_date) < getdate(today())):
 				counts["overdue"] += 1
 
+	# team = the project's Users table, then anyone assigned a task in it
+	team = frappe.get_all("Project User", filters={"parent": name, "parenttype": "Project"}, pluck="user")
+	for t in tasks:
+		team.extend(json_list(t.get("_assign")))
+	serialized = [serialize(t) for t in tasks]
+
 	return {
 		**row,
+		"page": frappe.db.get_value("Folio Page", {"project": name, "is_project_page": 1, "is_archived": 0}),
+		"customer_name": frappe.db.get_value("Customer", row.customer, "customer_name") if row.customer else None,
+		"team": [user_info(u) for u in dict.fromkeys(team) if u],
+		"can_edit": bool(frappe.has_permission("Project", "write", name)),
 		"can_create_task": bool(frappe.has_permission("Task", "create")),
 		"counts": counts,
-		"tasks": [serialize(t) for t in tasks],
+		"tasks": serialized,
 	}
+
+
+def json_list(value) -> list:
+	try:
+		return json.loads(value or "[]")
+	except ValueError:
+		return []
+
+
+@frappe.whitelist(methods=["POST"])
+def set_status(name: str, status: str) -> dict:
+	"""Change the project status from its page header (ERPNext permissions + validation)."""
+	require_erpnext()
+	if status not in STATUSES:
+		frappe.throw(frappe._("Invalid status"))
+	project = frappe.get_doc("Project", name)
+	project.check_permission("write")
+	project.status = status
+	project.save()
+	return get_project(name)
 
 
 @frappe.whitelist()

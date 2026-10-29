@@ -12,6 +12,10 @@ describe('slash command filtering', () => {
     expect(titles('task', {})).not.toContain('Task')
     expect(titles('', {})).not.toContain('Task')
   })
+  it('hides /project on a project page', () => {
+    expect(titles('project', { erpnext: true })).toContain('Project')
+    expect(titles('project', { erpnext: true, projectPage: 'PROJ-0001' })).not.toContain('Project')
+  })
   it('keeps the grouped menu when nothing is typed', () => {
     expect(filterCommands('', {})[0].group).toBe('Basic blocks')
   })

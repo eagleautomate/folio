@@ -1,6 +1,6 @@
 // Browser test for ERPNext task blocks (needs ERPNext + demo data on the site).
 //   node e2e/tasks.mjs e2e/shots
-// As sophie.brunner@folio.test: opens the demo task board, creates a page,
+// As sophie.brunner@folio.test: renders task blocks for existing tasks, creates a page,
 // adds a task with /task, ticks it, checks ERPNext, reloads, then cleans up.
 import puppeteer from 'puppeteer-core'
 const B = process.env.FOLIO_URL || 'http://localhost:8008'
@@ -23,17 +23,22 @@ await page.evaluate(() => fetch('/api/method/login', { method: 'POST', headers: 
 await page.goto(`${B}/folio`, { waitUntil: 'networkidle0' })
 const sidebar = await api('folio.api.workspace.get_sidebar')
 
-// 1. the seeded task board renders live tasks
-const board = sidebar.pages.find((p) => p.title === 'Relaunch task board')
+// 1. task blocks referencing existing tasks render live data
+const space = sidebar.spaces.find((s) => s.title === 'Website Relaunch').name
+const existing = await api('frappe.client.get_list', { doctype: 'Task', filters: { project: 'PROJ-0001' }, fields: ['name', 'subject'], limit_page_length: 2 })
+const board = await api('folio.api.pages.create_page', {
+  space,
+  title: 'E2E task references',
+  content: { type: 'doc', content: existing.map((t) => ({ type: 'erpnextTask', attrs: { task: t.name, subject: t.subject } })) },
+})
 await page.goto(`${B}/folio/p/${board.name}`, { waitUntil: 'networkidle0' })
 await page.waitForFunction(() => document.querySelectorAll('.folio-task a[href^="/desk/task/"]').length > 0)
 await sleep(400)
 const rows = await page.$$eval('.folio-task', (els) => els.map((e) => e.innerText.replace(/\s+/g, ' ').trim()))
-step(`task board: ${rows.length} live task blocks, e.g. "${rows[0]}"`)
+step(`${rows.length} live task blocks, e.g. "${rows[0]}"`)
 await page.screenshot({ path: `${out}/tasks-board.png` })
 
 // 2. create a page, add a task with /task
-const space = sidebar.spaces.find((s) => s.title === 'Website Relaunch').name
 const created = await api('folio.api.pages.create_page', { space, title: 'Task block test' })
 await page.goto(`${B}/folio/p/${created.name}`, { waitUntil: 'networkidle0' })
 await page.waitForSelector('.folio-prose')
@@ -73,8 +78,10 @@ const hits = await api('folio.api.workspace.search', { query: 'E2E task from Fol
 step(`search finds the page by task title: ${hits.some((h) => h.name === created.name)}`)
 
 // cleanup
-await api('folio.api.pages.archive_page', { name: created.name })
-await api('folio.api.pages.delete_page', { name: created.name })
+for (const name of [created.name, board.name]) {
+  await api('folio.api.pages.archive_page', { name })
+  await api('folio.api.pages.delete_page', { name })
+}
 await page.evaluate(async (t) => {
   await fetch('/api/resource/Task/' + t, { method: 'DELETE', headers: { 'X-Frappe-CSRF-Token': window.csrf_token } })
 }, taskName)

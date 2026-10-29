@@ -33,7 +33,7 @@ folio/                         Python package (the Frappe app)
     pages.py                   page CRUD, save_content (conflict check), move, trash, versions, favorites
     spaces.py                  space CRUD + members
     tasks.py                   ERPNext task blocks (create/link/tick, ERPNext permissions)
-    projects.py                live data for the project block
+    projects.py                live project data (header, Tasks tab, card), set_status
   projects.py                  Project doc_events: auto project pages, rename, trash, backfill
   content.py                   ProseMirror JSON builders (page templates, demo, tests)
   folio/doctype/               Folio Space, Folio Space Member, Folio Page,
@@ -44,6 +44,8 @@ folio/                         Python package (the Frappe app)
 frontend/                      Vue 3 + frappe-ui + TipTap SPA (Vite)
   src/data/workspace.js        sidebar store: spaces, flat page list, favorites
   src/pages/Page.vue           page view: header, autosave, conflict handling
+  src/components/project/      project page: ProjectPage (tabs), ProjectHeader, ProjectTasks
+  src/data/project.js          useProject(): live ERPNext project data for a project page
   src/components/editor/       TipTap editor, slash menu, callout, page links, mentions
   src/components/Sidebar.vue   sidebar + PageTreeItem.vue (recursive tree, drag & drop)
   e2e/smoke.mjs                Puppeteer smoke test
@@ -107,6 +109,8 @@ its subtree to the trash; deleting is only allowed from the trash.
   cannot create Tasks. Demo/test users that create tasks need Projects User.
 - A Single DocType's field defaults aren't stored until saved; `install.ensure_settings`
   writes Folio Settings defaults on install/migrate.
+- `patches.txt` (like `apps.txt`) may lack a trailing newline: appending with `>>`
+  glues your patch onto the last comment and it silently never runs.
 - `bench execute` hides import errors as `NameError: name 'folio' is not defined`;
   run the same call through `bench console` to see the real traceback.
 - Datetimes are naive, in the system timezone (Europe/Zurich here). The SPA syncs

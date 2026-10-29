@@ -22,7 +22,7 @@
     <span v-if="showProject && task.project_name" class="hidden shrink-0 text-xs text-ink-gray-5 sm:inline">
       {{ task.project_name }}
     </span>
-    <span v-if="task.due && !done" class="shrink-0 text-xs" :class="overdue ? 'text-ink-red-4' : 'text-ink-gray-5'">
+    <span v-if="task.due && !done" class="shrink-0 text-xs" :class="overdue ? 'text-ink-red-6' : 'text-ink-gray-5'">
       {{ formatDue(task.due) }}
     </span>
     <div v-if="people.length" class="flex shrink-0 -space-x-1.5">

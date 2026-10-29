@@ -63,44 +63,18 @@
           </div>
         </div>
 
-        <!-- tasks -->
-        <div class="px-4 py-2">
-          <div class="mb-1 flex items-center gap-3 text-xs text-ink-gray-5">
-            <span class="font-medium text-ink-gray-6">Tasks</span>
-            <span>{{ data.counts.open }} open</span>
-            <span>{{ data.counts.completed }} done</span>
-            <span v-if="data.counts.overdue" class="text-ink-red-4">{{ data.counts.overdue }} overdue</span>
-            <button class="ml-auto hover:text-ink-gray-8" title="Refresh" aria-label="Refresh tasks" @click="load">
-              <LucideRefreshCw class="size-3.5" :class="{ 'animate-spin': loading }" />
-            </button>
-          </div>
-
-          <p v-if="!data.tasks.length" class="py-2 text-base text-ink-gray-5">No tasks yet.</p>
-          <TaskRow
-            v-for="t in visibleTasks"
-            :key="t.name"
-            :task="t"
-            :show-project="false"
-            compact
-            @updated="onTaskUpdated"
-          />
-          <button
-            v-if="completedCount && !showCompleted"
-            class="mt-1 text-sm text-ink-gray-5 hover:text-ink-gray-8"
-            @click="showCompleted = true"
+        <!-- a card, not a second task list: the project page owns the tasks -->
+        <div class="flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm text-ink-gray-6">
+          <span>{{ data.counts.open }} open tasks</span>
+          <span>{{ data.counts.completed }} done</span>
+          <span v-if="data.counts.overdue" class="text-ink-red-6">{{ data.counts.overdue }} overdue</span>
+          <router-link
+            v-if="data.page"
+            :to="{ name: 'Page', params: { name: data.page }, query: { tab: 'tasks' } }"
+            class="ml-auto flex items-center gap-1 font-medium text-ink-gray-8 hover:underline"
           >
-            Show {{ completedCount }} completed
-          </button>
-
-          <form v-if="canAdd" class="mt-1 flex items-center gap-2.5 py-1" @submit.prevent="addTask">
-            <LucidePlus class="size-[18px] shrink-0 text-ink-gray-4" />
-            <input
-              v-model="newTask"
-              class="h-7 flex-1 border-0 bg-transparent p-0 text-base placeholder-ink-gray-4 focus:ring-0"
-              placeholder="Add a task to this project…"
-              :disabled="adding"
-            />
-          </form>
+            Open project page <LucideArrowRight class="size-3.5" />
+          </router-link>
         </div>
       </template>
     </div>
@@ -110,27 +84,18 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { NodeViewWrapper, nodeViewProps } from '@tiptap/vue-3'
-import { Badge, LoadingIndicator, call, toast } from 'frappe-ui'
-import TaskRow from './TaskRow.vue'
+import { Badge, LoadingIndicator, call } from 'frappe-ui'
 import { debounce } from '@/utils'
 
 const props = defineProps(nodeViewProps)
 
 const data = ref(null)
 const loading = ref(false)
-const showCompleted = ref(false)
-const newTask = ref('')
-const adding = ref(false)
 const query = ref('')
 const found = ref([])
 const highlight = ref(0)
 const picker = ref(null)
 
-const pageName = computed(() => props.extension.options.context?.pageName)
-const canAdd = computed(() => props.editor.isEditable && data.value?.can_create_task)
-const isDone = (t) => ['Completed', 'Cancelled'].includes(t.status)
-const completedCount = computed(() => data.value?.tasks.filter(isDone).length || 0)
-const visibleTasks = computed(() => (data.value?.tasks || []).filter((t) => showCompleted.value || !isDone(t)))
 const statusTheme = computed(
   () => ({ Open: 'blue', 'On hold': 'orange', Completed: 'green', Cancelled: 'gray' })[data.value?.status] || 'gray',
 )
@@ -150,27 +115,6 @@ async function load() {
     data.value = data.value || { name: props.node.attrs.project, restricted: true }
   } finally {
     loading.value = false
-  }
-}
-
-function onTaskUpdated(updated) {
-  const i = data.value.tasks.findIndex((t) => t.name === updated.name)
-  if (i >= 0) data.value.tasks[i] = updated
-  load() // counts and % complete are computed by ERPNext
-}
-
-async function addTask() {
-  const subject = newTask.value.trim()
-  if (!subject) return
-  adding.value = true
-  try {
-    await call('folio.api.tasks.create_task', { page: pageName.value, subject, project: props.node.attrs.project })
-    newTask.value = ''
-    await load()
-  } catch (e) {
-    toast.error(e?.messages?.[0] || 'Could not create the task')
-  } finally {
-    adding.value = false
   }
 }
 

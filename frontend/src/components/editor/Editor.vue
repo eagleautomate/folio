@@ -27,6 +27,8 @@ const props = defineProps({
   content: { type: Object, default: null },
   editable: { type: Boolean, default: true },
   pageName: { type: String, required: true },
+  // set on a project page: tasks belong to this project and /project is hidden
+  projectPage: { type: String, default: null },
 })
 const emit = defineEmits(['update', 'create-sub-page'])
 
@@ -35,6 +37,7 @@ const fileInput = ref(null)
 // Callbacks the slash menu can trigger; they need the page context.
 const context = {
   pageName: props.pageName,
+  projectPage: props.projectPage,
   erpnext: !!state.boot?.erpnext_installed,
   createSubPage: () => emit('create-sub-page'),
   pickImage: () => fileInput.value?.click(),

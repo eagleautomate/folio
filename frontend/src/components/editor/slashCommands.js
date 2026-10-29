@@ -119,7 +119,7 @@ export const COMMANDS = [
   {
     group: 'ERPNext',
     title: 'Task',
-    description: 'Create or link an ERPNext task',
+    description: 'Create or link a task (on a project page: in this project)',
     icon: IconTask,
     keywords: ['task', 'erpnext', 'todo', 'assign', 'project'],
     requires: 'erpnext',
@@ -132,6 +132,7 @@ export const COMMANDS = [
     icon: IconProject,
     keywords: ['project', 'erpnext', 'tasks', 'overview', 'board'],
     requires: 'erpnext',
+    hiddenOn: 'projectPage', // a project page already is the project
     run: (e, r) => e.chain().focus().deleteRange(r).insertProjectBlock().run(),
   },
   {
@@ -165,7 +166,7 @@ export const COMMANDS = [
 
 export function filterCommands(query, context = {}) {
   const q = (query || '').toLowerCase().trim()
-  const available = COMMANDS.filter((c) => !c.requires || context[c.requires])
+  const available = COMMANDS.filter((c) => (!c.requires || context[c.requires]) && !(c.hiddenOn && context[c.hiddenOn]))
   if (!q) return available
   // Best match first: title starts with the query, then title contains it, then a
   // keyword starts with it. So "/task" picks "Task", not "To-do list" (keyword "task").

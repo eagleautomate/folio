@@ -14,6 +14,7 @@ import { SlashCommands } from './slashCommands'
 import { Callout } from './callout'
 import { PageLink } from './pageLink'
 import { UserMention } from './mention'
+import { TaskBlock } from './taskBlock'
 
 const lowlight = createLowlight(common)
 
@@ -42,6 +43,7 @@ export function buildExtensions({ context = {} } = {}) {
     Callout,
     PageLink,
     UserMention,
+    TaskBlock.configure({ context }),
     SlashCommands.configure({ context }),
   ]
 }

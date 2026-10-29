@@ -4,7 +4,7 @@
 import frappe
 from frappe import _
 
-from folio.permissions import check_space_access, clear_access_cache, is_folio_user
+from folio.permissions import check_space_access, clear_access_cache, get_space_access, is_folio_user
 from folio.utils import next_sort_order
 
 SPACE_FIELDS = ["name", "title", "icon", "description", "visibility", "default_access", "project", "sort_order"]
@@ -55,6 +55,11 @@ def set_member(name: str, user: str, access: str | None = None) -> dict:
 	check_space_access(name, "full")
 	doc = frappe.get_doc("Folio Space", name)
 	row = next((m for m in doc.members if m.user == user), None)
+	was_last_owner = (
+		row is not None
+		and row.access == "Full Access"
+		and sum(m.access == "Full Access" for m in doc.members) == 1
+	)
 	if access:
 		if access not in ("Full Access", "Can Edit", "Can View"):
 			frappe.throw(_("Invalid access level"))
@@ -65,9 +70,14 @@ def set_member(name: str, user: str, access: str | None = None) -> dict:
 	elif row:
 		doc.remove(row)
 
-	if not any(m.access == "Full Access" for m in doc.members) and doc.visibility == "Private":
+	# Only guard the last owner of a private space; spaces made by a manager may have none
+	# (managers always have full access), and adding members to those must still work.
+	if was_last_owner and access != "Full Access" and doc.visibility == "Private":
 		frappe.throw(_("A private space needs at least one member with Full Access"))
 	doc.save(ignore_permissions=True)
+	clear_access_cache()
+	if not get_space_access(name):
+		return {"name": name, "left": True}  # the user removed themselves
 	return get_space(name)
 
 

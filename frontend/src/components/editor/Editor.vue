@@ -21,6 +21,7 @@ import { toast } from 'frappe-ui'
 import { buildExtensions } from './extensions'
 import FormattingMenu from './FormattingMenu.vue'
 import { uploadFile } from '@/utils/upload'
+import { state } from '@/data/workspace'
 
 const props = defineProps({
   content: { type: Object, default: null },
@@ -33,6 +34,8 @@ const fileInput = ref(null)
 
 // Callbacks the slash menu can trigger; they need the page context.
 const context = {
+  pageName: props.pageName,
+  erpnext: !!state.boot?.erpnext_installed,
   createSubPage: () => emit('create-sub-page'),
   pickImage: () => fileInput.value?.click(),
 }

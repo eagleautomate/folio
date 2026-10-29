@@ -69,6 +69,10 @@ def page_link(page, title):
 	return {"type": "pageLink", "attrs": {"page": page, "title": title}}
 
 
+def task(name, subject):
+	return {"type": "erpnextTask", "attrs": {"task": name, "subject": subject}}
+
+
 def table(header, *rows):
 	def cell(kind, value):
 		return {"type": kind, "attrs": {"colspan": 1, "rowspan": 1, "colwidth": None}, "content": [p(value)]}

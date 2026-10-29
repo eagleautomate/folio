@@ -17,6 +17,7 @@ BLOCK_NODES = {
 	"tableRow",
 	"horizontalRule",
 	"pageLink",
+	"erpnextTask",
 }
 
 
@@ -47,8 +48,9 @@ def content_to_text(content) -> str:
 		elif node_type == "mention":
 			attrs = node.get("attrs") or {}
 			parts.append("@" + (attrs.get("label") or attrs.get("id") or ""))
-		elif node_type == "pageLink":
-			parts.append((node.get("attrs") or {}).get("title") or "")
+		elif node_type in ("pageLink", "erpnextTask"):
+			attrs = node.get("attrs") or {}
+			parts.append(attrs.get("title") or attrs.get("subject") or "")
 		elif node_type == "hardBreak":
 			parts.append("\n")
 		for child in node.get("content") or []:

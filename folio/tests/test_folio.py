@@ -122,6 +122,20 @@ class TestAccess(FolioTestCase):
 		self.assertRaises(frappe.PermissionError, pages.save_content, page, doc_json("hi"))
 		self.assertRaises(frappe.PermissionError, pages.create_page, space)
 
+	def test_manager_made_private_space_accepts_members(self):
+		# a manager isn't added as a member, so the space starts with no owner
+		frappe.set_user("Administrator")
+		space = spaces.create_space(title="Admin space", visibility="Private")["name"]
+		spaces.set_member(space, MEMBER, "Can Edit")
+		self.assertEqual(get_space_access(space, MEMBER), "edit")
+
+	def test_last_owner_of_private_space_is_kept(self):
+		space = self.make_space(visibility="Private")
+		self.assertRaises(frappe.ValidationError, spaces.set_member, space, OWNER, "Can View")
+		self.assertRaises(frappe.ValidationError, spaces.set_member, space, OWNER, None)
+		spaces.set_member(space, MEMBER, "Full Access")
+		spaces.set_member(space, OWNER, None)  # fine: MEMBER still owns it
+
 	def test_website_user_has_no_access(self):
 		email = "folio-website@folio.test"
 		if not frappe.db.exists("User", email):

@@ -3,7 +3,7 @@
 Status keys: `[x]` done and verified · `[ ]` not started · `[~]` partly done.
 Each step ships on its own and is verified (tests + build + browser check) before the next.
 
-## Phase 1 — Core pages (current)
+## Phase 1 — Core pages
 
 - [x] App scaffold, sites `folio.localhost` (demo) and `folio-test.localhost` (tests)
 - [x] DocTypes: Space, Space Member, Page, Page Version, Favorite
@@ -27,10 +27,10 @@ Each step ships on its own and is verified (tests + build + browser check) befor
 - [ ] Filters, sorts, grouping; inline database block inside a page
 - [ ] Each row opens as a page
 
-## Phase 3 — ERPNext layer
+## Phase 3 — ERPNext layer (current)
 
 - [ ] Linked database views over Task / Project / Timesheet / Issue (permission-checked)
-- [ ] `/task` block = real ERPNext Task (tick = Completed, live status)
+- [x] `/task` block = real ERPNext Task: create or link, tick = Completed, live status/assignees/due date, refresh on focus, ERPNext permissions
 - [ ] Record mentions (`@PROJ-0001`) with live status chips
 - [ ] Auto page per Project (hook on Project insert), linked to the project space
 - [ ] Timesheet timer on task blocks + weekly timesheet grid

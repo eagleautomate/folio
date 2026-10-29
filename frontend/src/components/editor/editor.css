@@ -83,3 +83,6 @@
 .folio-drag-handle { @apply transition-opacity; }
 .ProseMirror-gapcursor::after { border-top-color: var(--ink-gray-8); }
 .folio-prose ::selection { @apply bg-blue-200/60; }
+
+.folio-task { @apply my-1; }
+.folio-task.is-selected > div { @apply ring-2 ring-outline-gray-3; }

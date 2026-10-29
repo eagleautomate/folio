@@ -82,13 +82,29 @@ favorites. The tree is derived (`childrenOf`). Renames patch the one object
 (`patchPage`), so the sidebar, breadcrumbs and page-link blocks update live. Structural
 changes (move, archive, duplicate) just reload the sidebar — it's one cheap call.
 
-## Where ERPNext plugs in (current + planned)
+## Where ERPNext plugs in
 
-- Now: `Folio Space.project` and `Folio Page.project` link fields; demo data creates
-  projects/tasks; users are Frappe users (and HRMS employees in the demo).
-- Next (phase 3): linked database views over Task/Project/Timesheet, task blocks that
-  are real ERPNext Tasks, record mentions, a page per project, timesheet timer.
-  Linked views must read through `frappe.get_list` so ERPNext's own permissions apply.
+ERPNext is optional. `folio.api.tasks.erpnext_enabled()` decides; the SPA reads
+`erpnext_installed` from `get_boot` and hides ERPNext-only slash commands
+(`requires: 'erpnext'` in `slashCommands.js`).
+
+**Task blocks** (`erpnextTask` node, `folio/api/tasks.py`, `TaskBlockView.vue`):
+
+- The page stores only `{task, subject}`. Status, assignees, due date and project are
+  read live via `get_tasks` (batched per tick in `src/data/tasks.js`, refreshed on
+  window focus / tab visible). `subject` is a cache for search and loading states.
+- Create: `create_task(page, subject)` puts the Task in the page's `project`, else the
+  space's `project`. Link: `search_tasks` (via `frappe.get_list`), page-project first.
+- Tick: `set_completed` sets `Completed` + `completed_on/by`, or back to `Open`.
+  ERPNext's own validation runs (open dependencies block completion; completion
+  closes assignments, so done tasks show `completed_by` instead of assignees).
+- **Two permission checks:** Folio (edit the page to create; view it to read) *and*
+  ERPNext (`Task` create/read/write via normal `insert`/`save`/`has_permission`, never
+  `ignore_permissions`). Unreadable tasks render as "a task you don't have access to";
+  deleted ones as "(deleted in ERPNext)".
+
+Still planned: record mentions, linked database views over Task/Project/Timesheet, a
+page per project, timesheet timer. Linked views must read through `frappe.get_list`.
 
 ## Real-time (planned)
 

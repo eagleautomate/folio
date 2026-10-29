@@ -57,6 +57,7 @@
 <script setup>
 import { computed, nextTick, ref } from 'vue'
 import { BubbleMenu } from '@tiptap/vue-3/menus'
+import { NodeSelection } from '@tiptap/pm/state'
 import { Button, Dropdown } from 'frappe-ui'
 import IconBold from '~icons/lucide/bold'
 import IconItalic from '~icons/lucide/italic'
@@ -107,7 +108,8 @@ const currentBlock = computed(() => {
 
 function shouldShow({ editor, state }) {
   const { empty } = state.selection
-  if (empty || !editor.isEditable) {
+  // a whole block selected (task, page link, image…) has nothing to format
+  if (empty || !editor.isEditable || state.selection instanceof NodeSelection) {
     linkMode.value = false
     return false
   }

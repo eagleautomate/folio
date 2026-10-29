@@ -2,6 +2,19 @@
 
 Short records of choices that someone might otherwise undo. Newest first.
 
+## 2026-10-29 — ERPNext stays optional; ERPNext data obeys ERPNext permissions
+
+Folio installs on plain Frappe; ERPNext features switch on when ERPNext is present
+(`required_apps` stays `["frappe"]`). Anything that reads or writes ERPNext records
+goes through ERPNext's permission checks as the session user, on top of Folio's page
+access. Page access alone never grants access to a Task.
+
+## 2026-10-29 — Task blocks store a reference, not a copy
+
+The page JSON holds the Task name and a cached subject only. Status etc. are always
+live, so ERPNext stays the single source of truth and nothing needs syncing back.
+Live updates are on window focus for now; push updates come with realtime (phase 4).
+
 ## 2026-10-29 — Store a page as one ProseMirror JSON document
 
 Not one row per block (Notion's model). One document per page keeps saves, versions,

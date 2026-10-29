@@ -32,6 +32,7 @@ folio/                         Python package (the Frappe app)
     workspace.py               get_boot, get_sidebar, search, get_recent, get_users
     pages.py                   page CRUD, save_content (conflict check), move, trash, versions, favorites
     spaces.py                  space CRUD + members
+    tasks.py                   ERPNext task blocks (create/link/tick, ERPNext permissions)
   folio/doctype/               Folio Space, Folio Space Member, Folio Page,
                                Folio Page Version, Folio Favorite
   www/folio.py                 serves the SPA at /folio (boot data, login redirect)
@@ -52,7 +53,9 @@ frontend/                      Vue 3 + frappe-ui + TipTap SPA (Vite)
   (Procfile line `web_folio`). Admin: `Administrator` / `admin`.
 - Demo users (password `admin12345!`): `anna.keller@folio.test` (Folio Manager),
   `luca.meier`, `sophie.brunner`, `marco.rossi`, `elena.weber`, `jonas.huber` — all `@folio.test`.
-- Test site: `folio-test.localhost` (`allow_tests` on).
+- Test sites (`allow_tests` on): `folio-test.localhost` (frappe + folio) and
+  `folio-erp-test.localhost` (frappe + erpnext + folio, for task-block tests).
+  ERPNext tests skip themselves on the plain site; run the suite on both.
 
 ## Commands
 
@@ -61,9 +64,12 @@ cd ~/Desktop/frappe-bench && export PATH="$PWD/env/bin:$PATH"
 
 bench start                                                     # all processes
 bench --site folio-test.localhost run-tests --app folio --skip-before-tests
+bench --site folio-erp-test.localhost run-tests --app folio --skip-before-tests
 cd apps/folio/frontend && yarn build                            # or: bench build --app folio
 cd apps/folio/frontend && yarn dev                              # Vite dev server, proxies to the bench
+cd apps/folio/frontend && yarn test                             # vitest unit tests
 cd apps/folio/frontend && yarn e2e                              # browser smoke test (needs bench running + demo data)
+cd apps/folio/frontend && node e2e/tasks.mjs e2e/shots          # ERPNext task-block browser test
 
 bench --site folio.localhost execute folio.demo.seed.run        # demo data (idempotent)
 bench --site folio.localhost execute folio.demo.seed.clear      # remove demo spaces/pages
@@ -115,6 +121,10 @@ its subtree to the trash; deleting is only allowed from the trash.
 - Icons: `<LucideFileText />` in templates is auto-imported; in `<script>` import
   `~icons/lucide/<name>`; in frappe-ui props use the string `'lucide-<name>'`.
 - Absolute asset paths in templates (`src="/assets/..."`) break the Vite build; bind them.
+- Inputs inside node views: TipTap re-focuses the editor a frame after a slash command
+  inserts a block. Focus the input after two `requestAnimationFrame`s and ignore blur
+  right after mount (see `TaskBlockView.vue`), or the draft deletes itself.
+- The bubble menu must not show for a `NodeSelection` (whole block selected).
 - TipTap's `commands.focus()` is deferred a frame; call `view.focus()` first when
   focus must move immediately (see `Editor.vue`).
 - The `@tiptap/extension-drag-handle` peer-requires Yjs packages; they are installed
@@ -122,7 +132,7 @@ its subtree to the trash; deleting is only allowed from the trash.
 
 ## Before you say "done"
 
-1. `run-tests` on `folio-test.localhost` is OK.
+1. `run-tests` is OK on `folio-test.localhost` and `folio-erp-test.localhost`.
 2. `yarn build` succeeds with no new warnings you introduced.
 3. For UI work: `yarn e2e` passes and you looked at the screenshots.
 4. `docs/roadmap.md` is updated if a roadmap item moved; `docs/decisions.md` if you

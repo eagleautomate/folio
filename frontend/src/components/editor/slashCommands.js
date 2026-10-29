@@ -19,6 +19,7 @@ import IconCode from '~icons/lucide/code'
 import IconTable from '~icons/lucide/table'
 import IconImage from '~icons/lucide/image'
 import IconPage from '~icons/lucide/file-text'
+import IconTask from '~icons/lucide/circle-check-big'
 
 // `run(editor, range, ctx)` performs the insert; ctx carries page-level callbacks
 // (creating sub-pages, uploading images) supplied by Editor.vue.
@@ -115,6 +116,15 @@ export const COMMANDS = [
     run: (e, r) => e.chain().focus().deleteRange(r).setHorizontalRule().run(),
   },
   {
+    group: 'ERPNext',
+    title: 'Task',
+    description: 'Create or link an ERPNext task',
+    icon: IconTask,
+    keywords: ['task', 'erpnext', 'todo', 'assign', 'project'],
+    requires: 'erpnext',
+    run: (e, r) => e.chain().focus().deleteRange(r).insertTaskBlock().run(),
+  },
+  {
     group: 'Advanced',
     title: 'Code',
     description: 'Code block with syntax highlighting',
@@ -143,12 +153,24 @@ export const COMMANDS = [
   },
 ]
 
-export function filterCommands(query) {
+export function filterCommands(query, context = {}) {
   const q = (query || '').toLowerCase().trim()
-  if (!q) return COMMANDS
-  return COMMANDS.filter(
-    (c) => c.title.toLowerCase().includes(q) || c.keywords.some((k) => k.startsWith(q)),
-  )
+  const available = COMMANDS.filter((c) => !c.requires || context[c.requires])
+  if (!q) return available
+  // Best match first: title starts with the query, then title contains it, then a
+  // keyword starts with it. So "/task" picks "Task", not "To-do list" (keyword "task").
+  const score = (c) => {
+    const title = c.title.toLowerCase()
+    if (title.startsWith(q)) return 0
+    if (title.includes(q)) return 1
+    if (c.keywords.some((k) => k.startsWith(q))) return 2
+    return -1
+  }
+  return available
+    .map((c) => [score(c), c])
+    .filter(([s]) => s >= 0)
+    .sort((a, b) => a[0] - b[0])
+    .map(([, c]) => ({ ...c, group: undefined })) // groups don't apply to a ranked list
 }
 
 export const SlashCommands = Extension.create({
@@ -171,7 +193,7 @@ export const SlashCommands = Extension.create({
           const $from = state.doc.resolve(range.from)
           return $from.parent.type.name !== 'codeBlock'
         },
-        items: ({ query }) => filterCommands(query),
+        items: ({ query }) => filterCommands(query, this.options.context),
         command: ({ editor, range, props }) => props.run(editor, range, this.options.context),
         render: vueSuggestionRenderer(CommandList),
       }),

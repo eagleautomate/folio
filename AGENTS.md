@@ -80,6 +80,7 @@ cd apps/folio/frontend && node e2e/projects.mjs e2e/shots       # project pages 
 cd apps/folio/frontend && node e2e/board.mjs e2e/shots          # board / table / task panel browser test
 cd apps/folio/frontend && node e2e/overview.mjs e2e/shots       # projects overview browser test
 cd apps/folio/frontend && node e2e/sidebar.mjs e2e/shots        # finished projects leave the sidebar
+cd apps/folio/frontend && node e2e/spaces.mjs e2e/shots         # space settings dialog
 cd apps/folio/frontend && yarn lint                             # ESLint (Vue + JS)
 
 bench --site folio.localhost execute folio.demo.seed.run        # demo data (idempotent)
@@ -161,6 +162,11 @@ its subtree to the trash; deleting is only allowed from the trash.
   `section[data-column] [draggable]`.
 - frappe-ui `FormControl type="date"` is a custom picker, not `<input type=date>`; Folio
   uses native date inputs (`.folio-select`) for dates.
+- A second user in the same test needs its own `browser.createBrowserContext()`;
+  a new page shares cookies, so `/login` redirects into the Desk as the first user.
+- Wait for confirmation dialogs to finish closing before clicking what's under them.
+- After a refused change, re-render bound `<select>`s (`:key` on a version counter):
+  Vue doesn't repaint a select whose bound value didn't change.
 - HTML5 drag and drop: dispatch `DragEvent`s with a shared `DataTransfer`
   (see `e2e/board.mjs`); headless Chrome doesn't synthesise them from mouse moves.
 - The Vite build does not catch undefined variables in `<script setup>` (a missing

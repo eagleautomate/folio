@@ -48,6 +48,13 @@ change the space and its members. The same functions back:
 Access is cached per request in `frappe.local.folio_space_access`; call
 `clear_access_cache()` after changing members.
 
+Space settings (`SpaceSettingsDialog.vue`, opened from the space's ⋯ menu) use
+`spaces.get_space` (members with names, `can_manage`, `page_count`,
+`is_projects_space`), `update_space` (validated fields; project needs ERPNext read
+access), `set_member` (desk users only; the last Full Access member can't be removed
+or downgraded, in any space) and `delete_space` (Full Access; never the projects
+space). After a refused change the dialog reloads so it shows what the server kept.
+
 ## Page content and saving
 
 - Content is TipTap/ProseMirror JSON (`Folio Page.content`). The schema is whatever

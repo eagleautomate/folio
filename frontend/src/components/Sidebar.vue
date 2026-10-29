@@ -62,6 +62,16 @@
               :class="{ '-rotate-90': collapsed[space.name] }"
             />
           </button>
+          <Dropdown :options="spaceMenu(space)" align="start">
+            <template #trigger>
+              <button
+                class="hidden size-5 items-center justify-center rounded hover:bg-surface-gray-4 group-hover:flex"
+                :aria-label="`${space.title} options`"
+              >
+                <LucideMoreHorizontal class="size-3.5" />
+              </button>
+            </template>
+          </Dropdown>
           <button
             v-if="canEditSpace(space.name)"
             class="hidden size-5 items-center justify-center rounded hover:bg-surface-gray-4 group-hover:flex"
@@ -111,6 +121,7 @@
 
     <TrashDialog v-model="trashOpen" />
     <NewSpaceDialog v-model="spaceOpen" />
+    <SpaceSettingsDialog v-model="settings.open" :space-name="settings.space" :initial-tab="settings.tab" />
   </aside>
 </template>
 
@@ -122,6 +133,7 @@ import SidebarLink from '@/components/SidebarLink.vue'
 import PageTreeItem from '@/components/PageTreeItem.vue'
 import TrashDialog from '@/components/TrashDialog.vue'
 import NewSpaceDialog from '@/components/NewSpaceDialog.vue'
+import SpaceSettingsDialog from '@/components/SpaceSettingsDialog.vue'
 import { state, childrenOf, createPage, movePage, canEditSpace, pagesByName } from '@/data/workspace'
 import { drag, resetDrag } from '@/composables/dragTree'
 import { search } from '@/composables/search'
@@ -134,6 +146,20 @@ const trashOpen = ref(false)
 const spaceOpen = ref(false)
 const dropOnSpace = ref(null)
 const collapsed = reactive(loadCollapsed())
+const settings = reactive({ open: false, space: null, tab: 'General' })
+
+function openSettings(space, tab = 'General') {
+  Object.assign(settings, { open: true, space: space.name, tab })
+}
+
+function spaceMenu(space) {
+  const manage = space.access === 'full'
+  return [
+    { label: manage ? 'Space settings' : 'About this space', icon: 'lucide-settings', onClick: () => openSettings(space) },
+    { label: manage ? 'Manage members' : 'Members', icon: 'lucide-users', onClick: () => openSettings(space, 'Members') },
+    canEditSpace(space.name) && { label: 'New page', icon: 'lucide-plus', onClick: () => newPage(space.name) },
+  ].filter(Boolean)
+}
 
 // Finished projects (Completed / Cancelled) stay out of the sidebar; "All projects" has them.
 // The page you're on is always shown, so the sidebar never loses your place.

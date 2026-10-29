@@ -17,7 +17,7 @@ Each step ships on its own and is verified (tests + build + browser check) befor
 - [x] Slash menu, bubble formatting menu, block drag handle, @mention users, sub-page blocks
 - [x] Page icon (emoji), cover (gradients), full width, lock, version history + restore
 - [x] Demo data seeder + browser smoke test
-- [ ] Space settings dialog (rename, icon, visibility, members) — API exists, no UI yet
+- [x] Space settings dialog: general (icon, name, description, visibility, default access, ERPNext project), members (add / change / remove), delete
 - [ ] Per-page share with specific users (beyond space membership)
 - [ ] Comments on pages (Frappe `Comment`) and notifications for @mentions
 - [ ] Mobile layout (collapsible sidebar)

@@ -25,6 +25,17 @@ guests can't.
   delete them forever from there.
 - **Favorites**: star a page from its header or the sidebar menu.
 - **New space** dialog with icon and visibility.
+- **Space settings** (the ⋯ menu on a space in the sidebar):
+  - *General*: icon, name, description, who can see it (everyone / only members),
+    what non-members can do (edit / view), and the ERPNext project that `/task` in
+    this space defaults to. Save or cancel; unsaved changes are flagged.
+  - *Members*: add people by name or email with an access level, change anyone's
+    access, remove people (or leave the space yourself).
+  - A space always keeps at least one Full Access member; Folio refuses to remove or
+    downgrade the last one and says why.
+  - *Delete space*: permanently deletes the space and all its pages, after a
+    confirmation that says how many. The Projects space can't be deleted.
+  - People without Full Access see the settings read-only.
 - The same access rules apply in the Frappe desk (`/desk/folio-page`), so private
   pages can't be found there either.
 

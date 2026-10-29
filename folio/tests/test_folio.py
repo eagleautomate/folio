@@ -136,6 +136,56 @@ class TestAccess(FolioTestCase):
 		spaces.set_member(space, MEMBER, "Full Access")
 		spaces.set_member(space, OWNER, None)  # fine: MEMBER still owns it
 
+	def test_space_settings_details_and_validation(self):
+		space = self.make_space(title="Settings")
+		pages.create_page(space, title="One")
+		data = spaces.get_space(space)
+		self.assertTrue(data["can_manage"])
+		self.assertEqual(data["page_count"], 1)
+		self.assertEqual(data["members"][0]["user"], OWNER)
+		self.assertIn("full_name", data["members"][0])
+
+		updated = spaces.update_space(space, title="Renamed", icon="🧪", visibility="Private", description="x")
+		self.assertEqual((updated["title"], updated["icon"], updated["visibility"]), ("Renamed", "🧪", "Private"))
+		self.assertRaises(frappe.ValidationError, spaces.update_space, space, visibility="Public")
+		self.assertRaises(frappe.ValidationError, spaces.update_space, space, default_access="Full Access")
+		self.assertRaises(frappe.ValidationError, spaces.set_member, space, MEMBER, "Owner")
+
+	def test_only_full_access_can_change_settings(self):
+		space = self.make_space()
+		spaces.set_member(space, MEMBER, "Can Edit")
+		self.as_user(MEMBER)
+		self.assertFalse(spaces.get_space(space)["can_manage"])
+		self.assertRaises(frappe.PermissionError, spaces.update_space, space, title="Mine now")
+		self.assertRaises(frappe.PermissionError, spaces.set_member, space, MEMBER, "Full Access")
+		self.assertRaises(frappe.PermissionError, spaces.delete_space, space)
+
+	def test_last_owner_kept_in_workspace_spaces_too(self):
+		space = self.make_space(visibility="Workspace")
+		self.assertRaises(frappe.ValidationError, spaces.set_member, space, OWNER, "Can Edit")
+
+	def test_only_active_desk_users_can_be_added(self):
+		space = self.make_space()
+		self.assertRaises(frappe.ValidationError, spaces.set_member, space, "nobody@folio.test", "Can Edit")
+
+	def test_projects_space_cannot_be_deleted(self):
+		space = self.make_space(title="Projects home")
+		frappe.db.set_single_value("Folio Settings", "projects_space", space)
+		try:
+			self.assertTrue(spaces.get_space(space)["is_projects_space"])
+			self.assertRaises(frappe.ValidationError, spaces.delete_space, space)
+		finally:
+			frappe.db.set_single_value("Folio Settings", "projects_space", None)
+
+	def test_delete_space_removes_its_pages(self):
+		space = self.make_space()
+		parent = pages.create_page(space, title="Parent")["name"]
+		child = pages.create_page(space, title="Child", parent_page=parent)["name"]
+		spaces.delete_space(space)
+		self.assertFalse(frappe.db.exists("Folio Space", space))
+		self.assertFalse(frappe.db.exists("Folio Page", parent))
+		self.assertFalse(frappe.db.exists("Folio Page", child))
+
 	def test_website_user_has_no_access(self):
 		email = "folio-website@folio.test"
 		if not frappe.db.exists("User", email):

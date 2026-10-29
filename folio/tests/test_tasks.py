@@ -123,3 +123,38 @@ class TestTaskBlocks(IntegrationTestCase):
 	def test_task_subject_is_searchable(self):
 		doc = {"type": "doc", "content": [{"type": "erpnextTask", "attrs": {"task": "T-1", "subject": "Book venue"}}]}
 		self.assertEqual(content_to_text(doc), "Book venue")
+
+	def test_update_task_fields_and_completion(self):
+		self.as_user(PM)
+		name = tasks.create_task(self.page, "Draft brief")["name"]
+		data = tasks.update_task(name, subject="Final brief", priority="High", exp_end_date="2026-12-01", description="<p>Hi</p>")
+		self.assertEqual((data["subject"], data["priority"], str(data["due"])[:10]), ("Final brief", "High", "2026-12-01"))
+		self.assertEqual(data["description"], "<p>Hi</p>")
+
+		done = tasks.update_task(name, status="Completed")
+		self.assertEqual((done["status"], done["completed_by"]), ("Completed", PM))
+		reopened = tasks.update_task(name, status="Working")
+		self.assertIsNone(reopened["completed_by"])
+
+		self.assertRaises(frappe.ValidationError, tasks.update_task, name, status="Overdue")  # ERPNext's job sets it
+		self.assertRaises(frappe.ValidationError, tasks.update_task, name, priority="Whenever")
+		self.assertRaises(frappe.ValidationError, tasks.update_task, name, subject="  ")
+		# fields outside the allow-list are ignored, not written
+		tasks.update_task(name, project="SOMETHING-ELSE", subject="Final brief")
+		self.assertEqual(frappe.db.get_value("Task", name, "project"), self.project.name)
+
+	def test_set_assignees_replaces_the_set(self):
+		self.as_user(PM)
+		name = tasks.create_task(self.page, "Assign me")["name"]
+		self.assertEqual([a["user"] for a in tasks.set_assignees(name, [PM, VIEWER])["assignees"]], [PM, VIEWER])
+		self.assertEqual([a["user"] for a in tasks.set_assignees(name, [VIEWER])["assignees"]], [VIEWER])
+		self.assertEqual(tasks.set_assignees(name, "[]")["assignees"], [])
+
+	def test_editing_needs_erpnext_write_permission(self):
+		self.as_user(PM)
+		name = tasks.create_task(self.page, "Not yours")["name"]
+		self.as_user(WRITER)
+		self.assertRaises(frappe.PermissionError, tasks.get_task, name)
+		self.assertRaises(frappe.PermissionError, tasks.update_task, name, subject="Hijack")
+		self.assertRaises(frappe.PermissionError, tasks.set_assignees, name, [WRITER])
+

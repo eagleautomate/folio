@@ -34,16 +34,28 @@ export function pageTitle(page) {
 }
 
 export function debounce(fn, wait) {
-  let timer
+  let timer = null
+  let lastArgs = null
   const debounced = (...args) => {
+    lastArgs = args
     clearTimeout(timer)
-    timer = setTimeout(() => fn(...args), wait)
+    timer = setTimeout(() => {
+      timer = null
+      fn(...lastArgs)
+    }, wait)
   }
+  // flush(args): run now with these args. flush(): run now only if a call is pending.
   debounced.flush = (...args) => {
+    const pending = timer !== null
     clearTimeout(timer)
-    return fn(...args)
+    timer = null
+    if (args.length) return fn(...args)
+    if (pending) return fn(...lastArgs)
   }
-  debounced.cancel = () => clearTimeout(timer)
+  debounced.cancel = () => {
+    clearTimeout(timer)
+    timer = null
+  }
   return debounced
 }
 

@@ -64,7 +64,7 @@
         </div>
       </div>
 
-      <div class="mx-auto px-6 sm:px-12" :class="doc.full_width ? 'max-w-none' : 'max-w-[720px]'">
+      <div class="mx-auto px-6 sm:px-12" :class="wide ? 'max-w-none' : 'max-w-[720px]'">
         <!-- icon + title -->
         <div class="group relative" :class="doc.cover ? (doc.icon ? '-mt-10' : 'pt-8') : 'pt-16'">
           <EmojiPicker v-if="doc.icon" v-model="doc.icon" removable @select="(e) => setMeta({ icon: e })">
@@ -125,7 +125,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { onBeforeRouteLeave, onBeforeRouteUpdate, useRouter } from 'vue-router'
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 import { Button, Dropdown, LoadingIndicator, call, createResource, toast } from 'frappe-ui'
 import Editor from '@/components/editor/Editor.vue'
 import ProjectPage from '@/components/project/ProjectPage.vue'
@@ -144,6 +144,7 @@ import { COVERS, debounce, timeAgo } from '@/utils'
 
 const props = defineProps({ name: { type: String, required: true } })
 const router = useRouter()
+const route = useRoute()
 
 const doc = ref(null)
 const title = ref('')
@@ -175,6 +176,10 @@ const breadcrumbs = computed(() => [
   ...(doc.value?.breadcrumbs || []),
   ...(doc.value ? [{ name: props.name, title: title.value, icon: doc.value.icon }] : []),
 ])
+// full width when chosen, or while a project's Tasks tab shows a board/table
+const wide = computed(
+  () => !!doc.value?.full_width || (isProjectPage.value && route.query.tab === 'tasks' && ['board', 'table'].includes(route.query.view)),
+)
 const isProjectPage = computed(() => !!(doc.value?.is_project_page && doc.value?.project))
 const isFavorite = computed(() => state.favorites.includes(props.name))
 const canEditAccess = computed(() => ['edit', 'full'].includes(doc.value?.access))

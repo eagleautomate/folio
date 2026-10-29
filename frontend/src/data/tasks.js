@@ -42,3 +42,41 @@ if (typeof window !== 'undefined') {
     if (document.visibilityState === 'visible') refreshAllTasks()
   })
 }
+
+// ---- editing (board, table, side panel). Each returns the fresh task from ERPNext.
+
+export async function updateTask(name, fields) {
+  const task = await call('folio.api.tasks.update_task', { name, ...fields })
+  setTask(task)
+  return task
+}
+
+export async function setAssignees(name, users) {
+  const task = await call('folio.api.tasks.set_assignees', { name, users: JSON.stringify(users) })
+  setTask(task)
+  return task
+}
+
+export const TASK_STATUSES = ['Open', 'Working', 'Pending Review', 'Completed', 'Cancelled']
+export const TASK_PRIORITIES = ['Urgent', 'High', 'Medium', 'Low']
+
+export function isDone(task) {
+  return task.status === 'Completed' || task.status === 'Cancelled'
+}
+
+export function isOverdue(task) {
+  if (isDone(task)) return false
+  if (task.status === 'Overdue') return true
+  return !!task.due && new Date(String(task.due).replace(' ', 'T')) < new Date(new Date().toDateString())
+}
+
+export function statusTheme(status) {
+  return (
+    { Open: 'gray', Working: 'blue', 'Pending Review': 'orange', Overdue: 'red', Completed: 'green', Cancelled: 'gray' }[status] ||
+    'gray'
+  )
+}
+
+export function formatDue(value) {
+  return new Date(String(value).replace(' ', 'T')).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
+}

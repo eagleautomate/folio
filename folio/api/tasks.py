@@ -16,11 +16,16 @@ import json
 
 import frappe
 from frappe import _
+from frappe.desk.form import assign_to
 from frappe.utils import cint, today
 
 from folio.permissions import check_page_access
 
 DONE = ("Completed", "Cancelled")
+# Statuses a person can choose. "Overdue" is set by ERPNext's daily job, "Template" is for templates.
+SETTABLE_STATUSES = ("Open", "Working", "Pending Review", "Completed", "Cancelled")
+PRIORITIES = ("Low", "Medium", "High", "Urgent")
+EDITABLE = ("subject", "status", "priority", "exp_start_date", "exp_end_date", "description")
 FIELDS = ["name", "subject", "status", "priority", "project", "exp_end_date", "completed_by", "_assign", "modified"]
 
 
@@ -159,3 +164,67 @@ def search_tasks(page: str, query: str | None = None, limit: int = 8) -> list[di
 		return (r.project != project, r.status in DONE)
 
 	return sorted(rows, key=rank)[: min(cint(limit) or 8, 20)]
+
+
+@frappe.whitelist()
+def get_task(name: str) -> dict:
+	"""Everything the task side panel shows (adds description and start date)."""
+	require_erpnext()
+	task = frappe.get_doc("Task", name)
+	task.check_permission("read")
+	data = serialize(frappe.db.get_value("Task", name, FIELDS, as_dict=True))
+	data.update(
+		{
+			"description": task.description,
+			"start": task.exp_start_date,
+			"owner": task.owner,
+			"creation": task.creation,
+		}
+	)
+	return data
+
+
+@frappe.whitelist(methods=["POST"])
+def update_task(name: str, **fields) -> dict:
+	"""Edit a task from the board/table/panel. ERPNext permissions and validation apply."""
+	require_erpnext()
+	values = {k: v for k, v in fields.items() if k in EDITABLE}
+	if "status" in values and values["status"] not in SETTABLE_STATUSES:
+		frappe.throw(_("Status {0} can't be set by hand").format(values["status"]))
+	if "priority" in values and values["priority"] not in PRIORITIES:
+		frappe.throw(_("Invalid priority"))
+	if "subject" in values and not (values["subject"] or "").strip():
+		frappe.throw(_("A task needs a title"))
+
+	task = frappe.get_doc("Task", name)
+	task.check_permission("write")
+	was_done = task.status in DONE
+	task.update(values)
+	if task.status == "Completed" and not was_done:
+		task.completed_on = today()
+		task.completed_by = frappe.session.user
+	elif task.status not in DONE and was_done:
+		task.completed_on = None
+		task.completed_by = None
+	task.save()
+	return get_task(name)
+
+
+@frappe.whitelist(methods=["POST"])
+def set_assignees(name: str, users: str | list) -> dict:
+	"""Replace a task's assignees (board: drag to another person; panel: assignee picker)."""
+	require_erpnext()
+	if isinstance(users, str):
+		users = json.loads(users)
+	users = [u for u in dict.fromkeys(users or []) if u]
+	task = frappe.get_doc("Task", name)
+	task.check_permission("write")
+
+	current = json.loads(task.get("_assign") or "[]")
+	for user in current:
+		if user not in users:
+			assign_to.remove("Task", name, user)
+	new = [u for u in users if u not in current]
+	if new:
+		assign_to.add({"assign_to": new, "doctype": "Task", "name": name, "notify": 1})
+	return get_task(name)

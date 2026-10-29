@@ -76,6 +76,7 @@ cd apps/folio/frontend && yarn test                             # vitest unit te
 cd apps/folio/frontend && yarn e2e                              # browser smoke test (needs bench running + demo data)
 cd apps/folio/frontend && node e2e/tasks.mjs e2e/shots          # ERPNext task-block browser test
 cd apps/folio/frontend && node e2e/projects.mjs e2e/shots       # project pages browser test
+cd apps/folio/frontend && node e2e/board.mjs e2e/shots          # board / table / task panel browser test
 
 bench --site folio.localhost execute folio.demo.seed.run        # demo data (idempotent)
 bench --site folio.localhost execute folio.demo.seed.clear      # remove demo spaces/pages
@@ -141,6 +142,17 @@ its subtree to the trash; deleting is only allowed from the trash.
   focus must move immediately (see `Editor.vue`).
 - The `@tiptap/extension-drag-handle` peer-requires Yjs packages; they are installed
   on purpose (needed for collaboration later).
+
+## Writing browser tests
+
+- Give every record a test creates a unique name (`Date.now()`), clean it up at the
+  end, and never select by text that a leftover from an earlier run could also match.
+- Be precise with selectors: the sidebar is an `<aside>` and frappe-ui's toaster is a
+  `<section aria-label>`; use `aside[aria-label="Task details"]`, `section[data-column]`.
+- HTML5 drag and drop: dispatch `DragEvent`s with a shared `DataTransfer`
+  (see `e2e/board.mjs`); headless Chrome doesn't synthesise them from mouse moves.
+- The Vite build does not catch undefined variables in `<script setup>` (a missing
+  `useRoute()` import only failed at runtime). Exercise new code paths in a browser test.
 
 ## Before you say "done"
 

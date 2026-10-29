@@ -90,3 +90,6 @@
 
 .folio-project { @apply my-2; }
 .ProseMirror-focused .folio-project.is-selected > div { @apply ring-2 ring-outline-gray-3; }
+
+/* compact native selects / date inputs used in task panels */
+.folio-select { @apply h-7 w-full rounded border border-outline-gray-2 bg-surface-base px-2 py-0 text-sm text-ink-gray-8 focus:border-outline-gray-4 focus:ring-0 disabled:opacity-60; }

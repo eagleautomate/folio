@@ -1,24 +1,16 @@
 <template>
   <div class="group flex items-center gap-2.5" :class="compact ? 'py-1' : ''">
-    <button
-      class="flex size-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px] transition-colors"
-      :class="done ? 'border-transparent bg-surface-gray-7 text-ink-base' : 'border-outline-gray-4 hover:border-outline-gray-5'"
-      :disabled="!task.can_edit || busy"
-      :title="task.can_edit ? (done ? 'Mark as open' : 'Mark as completed') : 'You cannot edit this task in ERPNext'"
-      :aria-label="done ? 'Mark as open' : 'Mark as completed'"
-      @click="toggle"
-    >
-      <LucideCheck v-if="done" class="size-3" />
-    </button>
-    <a
-      :href="`/desk/task/${task.name}`"
-      target="_blank"
-      class="min-w-0 flex-1 truncate text-base text-ink-gray-8 hover:underline"
+    <TaskCheck :task="task" @updated="(t) => $emit('updated', t)" />
+    <!-- with an @open listener (Tasks tab) the title opens the side panel, else the Desk form -->
+    <component
+      :is="openable ? 'button' : 'a'"
+      v-bind="openable ? { type: 'button' } : { href: `/desk/task/${task.name}`, target: '_blank', title: `Open ${task.name} in ERPNext` }"
+      class="min-w-0 flex-1 truncate text-left text-base text-ink-gray-8 hover:underline"
       :class="{ 'text-ink-gray-5 line-through': done }"
-      :title="`Open ${task.name} in ERPNext`"
+      @click="openable && $emit('open', task)"
     >
       {{ task.subject }}
-    </a>
+    </component>
     <span v-if="showProject && task.project_name" class="hidden shrink-0 text-xs text-ink-gray-5 sm:inline">
       {{ task.project_name }}
     </span>
@@ -41,20 +33,21 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { Avatar, Badge, call, toast } from 'frappe-ui'
-import { setTask } from '@/data/tasks'
+import { computed } from 'vue'
+import { Avatar, Badge } from 'frappe-ui'
+import TaskCheck from '@/components/project/TaskCheck.vue'
+import { formatDue, isDone, isOverdue, statusTheme as themeFor } from '@/data/tasks'
 
 const props = defineProps({
   task: { type: Object, required: true },
   compact: { type: Boolean, default: false },
   showProject: { type: Boolean, default: true },
+  openable: { type: Boolean, default: false },
 })
-const emit = defineEmits(['updated'])
+defineEmits(['updated', 'open'])
 
-const busy = ref(false)
-const done = computed(() => ['Completed', 'Cancelled'].includes(props.task.status))
-const overdue = computed(() => props.task.due && new Date(String(props.task.due).replace(' ', 'T')) < new Date())
+const done = computed(() => isDone(props.task))
+const overdue = computed(() => isOverdue(props.task))
 
 // ERPNext closes assignments on completion; show who completed it instead
 const people = computed(() => {
@@ -63,32 +56,5 @@ const people = computed(() => {
   return t.assignees || []
 })
 
-const statusTheme = computed(
-  () =>
-    ({
-      Open: 'gray',
-      Working: 'blue',
-      'Pending Review': 'orange',
-      Overdue: 'red',
-      Completed: 'green',
-      Cancelled: 'gray',
-    })[props.task.status] || 'gray',
-)
-
-async function toggle() {
-  busy.value = true
-  try {
-    const updated = await call('folio.api.tasks.set_completed', { name: props.task.name, completed: done.value ? 0 : 1 })
-    setTask(updated)
-    emit('updated', updated)
-  } catch (e) {
-    toast.error(e?.messages?.[0] || 'Could not update the task')
-  } finally {
-    busy.value = false
-  }
-}
-
-function formatDue(value) {
-  return new Date(String(value).replace(' ', 'T')).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
-}
+const statusTheme = computed(() => themeFor(props.task.status))
 </script>

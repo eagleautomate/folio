@@ -121,6 +121,18 @@ ERPNext is optional. `folio.api.tasks.erpnext_enabled()` decides; the SPA reads
 - `on_update`: a renamed project renames its page if the title still matched.
   `on_trash`: page to trash, links cleared; `ignore_links_on_delete` lets the delete through.
 - Runs in a savepoint; any error is logged (Error Log) and never blocks ERPNext.
+- **Tasks tab views** (`ProjectTasks.vue`; state in the URL: `?tab=tasks&view=board&group=assignee&task=TASK-…`):
+  List (`TaskRow`), Board (`TaskBoard` + `TaskCard`), Table (`TaskTable`), and the
+  side panel (`TaskPanel`). Edits go through `tasks.update_task` (allow-listed fields,
+  ERPNext `save()` + permissions) and `tasks.set_assignees` (Frappe `assign_to`).
+  - Board by **status**: Open · Working · Pending Review · Completed (+ Cancelled if
+    any). ERPNext's daily job sets *Overdue*, so those cards sit in Open with a red
+    flag; dropping sets a real status. By **assignee**: a card sits under its first
+    assignee, dropping replaces the assignees (Unassigned clears them). By **priority**.
+    No ordering inside a column: ERPNext tasks have no manual order.
+  - Page.vue goes full width while a board/table is shown.
+  - The panel caps dates at the project's end date (ERPNext rejects later ones) and
+    shows ERPNext's own message if a save is refused, then reloads the server value.
 - Backfill: Folio Settings → "Create pages for existing projects".
 - Patch `v0_1.project_page_layout` migrated older pages (removed the embedded
   project block, moved pages into the projects space).

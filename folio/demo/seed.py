@@ -14,7 +14,7 @@ Requires ERPNext for the projects/tasks part; without it only Folio data is crea
 import frappe
 from frappe.utils import add_days, getdate, today
 
-from folio.demo.content import (
+from folio.content import (
 	bullets,
 	callout,
 	code,
@@ -38,7 +38,7 @@ MARKER = "folio_demo_seeded"
 
 PEOPLE = [
 	# first, last, department, extra roles
-	("Anna", "Keller", "Management", ["Folio Manager", "Projects Manager"]),
+	("Anna", "Keller", "Management", ["Folio Manager", "Projects Manager", "Projects User"]),
 	("Luca", "Meier", "Engineering", ["Projects User"]),
 	("Sophie", "Brunner", "Engineering", ["Projects User"]),
 	("Marco", "Rossi", "Operations", ["Projects User"]),

@@ -2,6 +2,14 @@
 
 Short records of choices that someone might otherwise undo. Newest first.
 
+## 2026-10-29 — Project pages: one per project, never blocking ERPNext
+
+Created from `doc_events` in a savepoint, errors only logged: a Folio problem must
+never stop someone saving a Project. The page goes to the project's own space if one
+is linked (and follows the link if it's added later), otherwise a shared "Projects"
+space, so project pages are easy to find without one space per project. A renamed
+project renames its page only if nobody re-titled the page.
+
 ## 2026-10-29 — ERPNext stays optional; ERPNext data obeys ERPNext permissions
 
 Folio installs on plain Frappe; ERPNext features switch on when ERPNext is present

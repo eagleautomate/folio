@@ -70,7 +70,7 @@
 
 .folio-mention { @apply rounded bg-surface-gray-2 px-1 py-0.5 font-medium text-ink-gray-8; }
 .folio-page-link { @apply my-0.5; }
-.folio-page-link.is-selected { @apply rounded bg-blue-50 ring-1 ring-blue-300; }
+.ProseMirror-focused .folio-page-link.is-selected { @apply rounded bg-blue-50 ring-1 ring-blue-300; }
 
 /* empty-block placeholder (TipTap only marks the block holding the cursor) */
 .folio-prose p.is-empty::before,
@@ -85,4 +85,8 @@
 .folio-prose ::selection { @apply bg-blue-200/60; }
 
 .folio-task { @apply my-1; }
-.folio-task.is-selected > div { @apply ring-2 ring-outline-gray-3; }
+/* only while editing: a page that starts with a block has it selected by default */
+.ProseMirror-focused .folio-task.is-selected > div { @apply ring-2 ring-outline-gray-3; }
+
+.folio-project { @apply my-2; }
+.ProseMirror-focused .folio-project.is-selected > div { @apply ring-2 ring-outline-gray-3; }

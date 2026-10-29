@@ -32,7 +32,7 @@ Each step ships on its own and is verified (tests + build + browser check) befor
 - [ ] Linked database views over Task / Project / Timesheet / Issue (permission-checked)
 - [x] `/task` block = real ERPNext Task: create or link, tick = Completed, live status/assignees/due date, refresh on focus, ERPNext permissions
 - [ ] Record mentions (`@PROJ-0001`) with live status chips
-- [ ] Auto page per Project (hook on Project insert), linked to the project space
+- [x] Auto page per Project: created on insert (linked space → Folio Settings space → "Projects"), renamed with it, trashed on delete, backfill button; live project block (status, progress, dates, task list, add/tick tasks) and `/project`
 - [ ] Timesheet timer on task blocks + weekly timesheet grid
 
 ## Phase 4 — Collaboration

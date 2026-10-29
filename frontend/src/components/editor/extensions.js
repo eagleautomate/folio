@@ -15,6 +15,7 @@ import { Callout } from './callout'
 import { PageLink } from './pageLink'
 import { UserMention } from './mention'
 import { TaskBlock } from './taskBlock'
+import { ProjectBlock } from './projectBlock'
 
 const lowlight = createLowlight(common)
 
@@ -44,6 +45,7 @@ export function buildExtensions({ context = {} } = {}) {
     PageLink,
     UserMention,
     TaskBlock.configure({ context }),
+    ProjectBlock.configure({ context }),
     SlashCommands.configure({ context }),
   ]
 }

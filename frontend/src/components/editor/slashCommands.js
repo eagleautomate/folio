@@ -20,6 +20,7 @@ import IconTable from '~icons/lucide/table'
 import IconImage from '~icons/lucide/image'
 import IconPage from '~icons/lucide/file-text'
 import IconTask from '~icons/lucide/circle-check-big'
+import IconProject from '~icons/lucide/folder-kanban'
 
 // `run(editor, range, ctx)` performs the insert; ctx carries page-level callbacks
 // (creating sub-pages, uploading images) supplied by Editor.vue.
@@ -123,6 +124,15 @@ export const COMMANDS = [
     keywords: ['task', 'erpnext', 'todo', 'assign', 'project'],
     requires: 'erpnext',
     run: (e, r) => e.chain().focus().deleteRange(r).insertTaskBlock().run(),
+  },
+  {
+    group: 'ERPNext',
+    title: 'Project',
+    description: "A project's status, progress and live task list",
+    icon: IconProject,
+    keywords: ['project', 'erpnext', 'tasks', 'overview', 'board'],
+    requires: 'erpnext',
+    run: (e, r) => e.chain().focus().deleteRange(r).insertProjectBlock().run(),
   },
   {
     group: 'Advanced',

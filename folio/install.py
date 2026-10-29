@@ -13,10 +13,18 @@ def before_install():
 
 def after_install():
 	create_roles()
+	ensure_settings()
 
 
 def after_migrate():
 	create_roles()
+	ensure_settings()
+
+
+def ensure_settings():
+	"""Store defaults for Folio Settings (a Single) the first time, without overriding a choice."""
+	if not frappe.db.exists("Singles", {"doctype": "Folio Settings", "field": "auto_create_project_pages"}):
+		frappe.db.set_single_value("Folio Settings", "auto_create_project_pages", 1)
 
 
 def create_roles():

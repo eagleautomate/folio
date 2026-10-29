@@ -103,8 +103,24 @@ ERPNext is optional. `folio.api.tasks.erpnext_enabled()` decides; the SPA reads
   `ignore_permissions`). Unreadable tasks render as "a task you don't have access to";
   deleted ones as "(deleted in ERPNext)".
 
-Still planned: record mentions, linked database views over Task/Project/Timesheet, a
-page per project, timesheet timer. Linked views must read through `frappe.get_list`.
+**Project pages** (`folio/projects.py`, hooked via `doc_events["Project"]`):
+
+- `after_insert` creates one page per Project (`is_project_page = 1`, `project` set,
+  template = project block + "Notes"). Space: a space linked to the project, else
+  Folio Settings → `projects_space`, else a "Projects" space created on first use.
+- Linking a space to a project later (`FolioSpace.adopt_project_page`) moves the
+  page and its sub-pages into that space.
+- `on_update`: a renamed project renames its page if the title still matched.
+  `on_trash`: page to trash, links cleared; `ignore_links_on_delete` lets the delete through.
+- Runs in a savepoint; any error is logged (Error Log) and never blocks ERPNext.
+- Backfill: Folio Settings → "Create pages for existing projects"
+  (`create_missing_project_pages`, managers only).
+- The `erpnextProject` block (`ProjectBlockView.vue`, `folio.api.projects.get_project`)
+  shows status, % complete, dates, counts and the task list via `frappe.get_list`
+  (ERPNext permissions); tasks render with the shared `TaskRow.vue`.
+
+Still planned: record mentions, linked database views over Task/Project/Timesheet,
+timesheet timer. Linked views must read through `frappe.get_list`.
 
 ## Real-time (planned)
 

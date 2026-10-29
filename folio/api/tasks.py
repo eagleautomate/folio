@@ -86,16 +86,21 @@ def get_tasks(names: str | list) -> dict:
 
 
 @frappe.whitelist(methods=["POST"])
-def create_task(page: str, subject: str) -> dict:
-	"""Create a Task from a page; it goes into the page's (or space's) project."""
+def create_task(page: str, subject: str, project: str | None = None) -> dict:
+	"""Create a Task from a page.
+
+	It goes into ``project`` when given (project blocks), else the page's or space's project.
+	"""
 	require_erpnext()
 	check_page_access(page, "edit")
 	subject = (subject or "").strip()
 	if not subject:
 		frappe.throw(_("Give the task a title"))
+	if project and not frappe.has_permission("Project", "read", project):
+		frappe.throw(_("You do not have access to project {0}").format(project), frappe.PermissionError)
 
 	task = frappe.get_doc(
-		{"doctype": "Task", "subject": subject, "project": default_project(page), "status": "Open"}
+		{"doctype": "Task", "subject": subject, "project": project or default_project(page), "status": "Open"}
 	)
 	task.insert()  # ERPNext permissions apply: needs create on Task (e.g. Projects User)
 	return serialize(frappe.db.get_value("Task", task.name, FIELDS, as_dict=True))

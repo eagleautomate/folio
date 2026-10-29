@@ -19,6 +19,7 @@
   "full_width",
   "is_locked",
   "project",
+  "is_project_page",
   "column_break_2",
   "content_version",
   "last_edited_by",
@@ -118,6 +119,15 @@
    "options": "Project"
   },
   {
+   "default": "0",
+   "depends_on": "project",
+   "description": "Created by Folio for this ERPNext project; renamed with it and trashed when it is deleted",
+   "fieldname": "is_project_page",
+   "fieldtype": "Check",
+   "label": "Project Page",
+   "read_only": 1
+  },
+  {
    "fieldname": "column_break_2",
    "fieldtype": "Column Break"
   },
@@ -172,7 +182,7 @@
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-10-29 10:00:00.000000",
+ "modified": "2026-10-29 14:00:00.000000",
  "modified_by": "Administrator",
  "module": "Folio",
  "name": "Folio Page",

@@ -1,7 +1,7 @@
 # Copyright (c) 2026, Eagle Automate and contributors
 # For license information, please see license.txt
 
-"""Tiny builders for TipTap/ProseMirror JSON, used by the demo seeder and tests."""
+"""Tiny builders for TipTap/ProseMirror JSON (project page template, demo data, tests)."""
 
 
 def text(value, *marks, href=None):

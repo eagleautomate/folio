@@ -33,6 +33,9 @@ folio/                         Python package (the Frappe app)
     pages.py                   page CRUD, save_content (conflict check), move, trash, versions, favorites
     spaces.py                  space CRUD + members
     tasks.py                   ERPNext task blocks (create/link/tick, ERPNext permissions)
+    projects.py                live data for the project block
+  projects.py                  Project doc_events: auto project pages, rename, trash, backfill
+  content.py                   ProseMirror JSON builders (page templates, demo, tests)
   folio/doctype/               Folio Space, Folio Space Member, Folio Page,
                                Folio Page Version, Folio Favorite
   www/folio.py                 serves the SPA at /folio (boot data, login redirect)
@@ -70,6 +73,7 @@ cd apps/folio/frontend && yarn dev                              # Vite dev serve
 cd apps/folio/frontend && yarn test                             # vitest unit tests
 cd apps/folio/frontend && yarn e2e                              # browser smoke test (needs bench running + demo data)
 cd apps/folio/frontend && node e2e/tasks.mjs e2e/shots          # ERPNext task-block browser test
+cd apps/folio/frontend && node e2e/projects.mjs e2e/shots       # project pages browser test
 
 bench --site folio.localhost execute folio.demo.seed.run        # demo data (idempotent)
 bench --site folio.localhost execute folio.demo.seed.clear      # remove demo spaces/pages
@@ -99,6 +103,10 @@ its subtree to the trash; deleting is only allowed from the trash.
 - A user with no roles is silently a *Website User*. Give test/demo users a desk
   role (`Folio User`) or `is_folio_user()` correctly rejects them.
 - `frappe.desk.form.assign_to.add()` takes no `ignore_permissions` kwarg.
+- ERPNext's Task permissions are on **Projects User** only; Projects Manager alone
+  cannot create Tasks. Demo/test users that create tasks need Projects User.
+- A Single DocType's field defaults aren't stored until saved; `install.ensure_settings`
+  writes Folio Settings defaults on install/migrate.
 - `bench execute` hides import errors as `NameError: name 'folio' is not defined`;
   run the same call through `bench console` to see the real traceback.
 - Datetimes are naive, in the system timezone (Europe/Zurich here). The SPA syncs

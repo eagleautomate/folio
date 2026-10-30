@@ -1,7 +1,7 @@
 app_name = "folio"
 app_title = "Folio"
 app_publisher = "Eagle Automate"
-app_description = "Notion-style workspace for pages, docs and databases, built natively on Frappe and ERPNext"
+app_description = "Notion-style workspace for pages, docs and project plans, built natively on Frappe and ERPNext"
 app_email = "mn@eagleautomation.in"
 app_license = "mit"
 

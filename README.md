@@ -215,8 +215,14 @@ tasks) on a **test site**:
 bench --site <site> execute folio.demo.seed.run
 ```
 
-Then log in as `anna.keller@folio.test` with the password `admin12345!`. Don't run the
-demo on a site with real data.
+Then log in as `anna.keller@folio.test` with the password `admin12345!`. These demo
+users exist only on a site where you ran the seeder above; they are not part of a
+normal install. Don't run the demo on a site with real data.
+
+## Known limitations
+
+- **Best on desktop.** The mobile layout isn't done yet (it's on the
+  [roadmap](docs/roadmap.md), Phase 1), so Folio works best in a desktop browser.
 
 ## Learn more
 
@@ -227,10 +233,12 @@ demo on a site with real data.
 | [docs/roadmap.md](docs/roadmap.md) | What's done and what's coming |
 | [docs/architecture.md](docs/architecture.md) | How it works inside (for developers) |
 | [AGENTS.md](AGENTS.md) | Commands, conventions and tests for contributors and AI coding assistants |
+| [docs/terms.md](docs/terms.md) | Terms of Service |
+| [docs/privacy.md](docs/privacy.md) | Privacy Policy: what Folio stores, and that it sends nothing elsewhere |
 
 The screenshots come from the demo data and are made by `frontend/e2e/screenshots.mjs`,
 so they can be refreshed with one command.
 
 ## License
 
-MIT
+[MIT](license.txt), © Eagle Automate

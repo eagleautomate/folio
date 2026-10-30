@@ -3,7 +3,7 @@ name = "folio"
 authors = [
     { name = "Eagle Automate", email = "mn@eagleautomation.in"}
 ]
-description = "Notion-style workspace for pages, docs and databases, built natively on Frappe and ERPNext"
+description = "Notion-style workspace for pages, docs and project plans, built natively on Frappe and ERPNext"
 requires-python = ">=3.14"
 readme = "README.md"
 dynamic = ["version"]

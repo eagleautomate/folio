@@ -93,6 +93,7 @@ cd apps/folio/frontend && node e2e/overview.mjs e2e/shots       # projects overv
 cd apps/folio/frontend && node e2e/sidebar.mjs e2e/shots        # finished projects leave the sidebar
 cd apps/folio/frontend && node e2e/spaces.mjs e2e/shots         # space settings dialog
 cd apps/folio/frontend && node e2e/access.mjs e2e/shots         # project pages follow ERPNext permissions (real users)
+cd apps/folio/frontend && node e2e/menus.mjs e2e/shots          # sidebar ⋯ menus open next to their row
 cd apps/folio/frontend && yarn lint                             # ESLint (Vue + JS)
 cd apps/folio/frontend && node e2e/screenshots.mjs ../docs/screenshots  # refresh README screenshots (cleans up after itself)
 
@@ -124,6 +125,9 @@ its subtree to the trash; deleting is only allowed from the trash.
 - A user with no roles is silently a *Website User*. Give test/demo users a desk
   role (`Folio User`) or `is_folio_user()` correctly rejects them.
 - `frappe.desk.form.assign_to.add()` takes no `ignore_permissions` kwarg.
+- Anything that must exist on first use (projects space, project pages) must also be
+  created on install / by a patch for sites installed earlier; don't rely on hooks that
+  only fire for new records.
 - ERPNext gives **Desk User** read on Project only at permlevel 1 (fields), so plain
   desk users can't open Projects; Projects User / Projects Manager can.
 - frappe-ui `createResource({ auto: true })` re-throws fetch errors as unhandled
@@ -184,6 +188,9 @@ its subtree to the trash; deleting is only allowed from the trash.
 - A second user in the same test needs its own `browser.createBrowserContext()`;
   a new page shares cookies, so `/login` redirects into the Desk as the first user.
 - Wait for confirmation dialogs to finish closing before clicking what's under them.
+- A menu's trigger must stay rendered while the menu is open (`v-model:open` on
+  frappe-ui `Dropdown`). Hover-only (`hidden group-hover:flex`) triggers vanish when the
+  pointer moves to the menu, and the menu jumps to the top-left corner.
 - After a refused change, re-render bound `<select>`s (`:key` on a version counter):
   Vue doesn't repaint a select whose bound value didn't change.
 - HTML5 drag and drop: dispatch `DragEvent`s with a shared `DataTransfer`

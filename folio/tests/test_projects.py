@@ -242,3 +242,22 @@ class TestProjectPages(IntegrationTestCase):
 		self.assertTrue(project_api.get_project(project.name)["can_complete"])
 		self.assertEqual(project_api.set_status(project.name, "Completed")["status"], "Completed")
 
+	def test_projects_from_before_install_get_pages(self):
+		from folio.install import backfill_project_pages_if_enabled
+		from folio.patches.v0_1 import backfill_project_pages as patch
+
+		frappe.db.set_single_value("Folio Settings", "auto_create_project_pages", 0)
+		frappe.clear_document_cache("Folio Settings", "Folio Settings")
+		older = self.make_project()  # like a project that existed before Folio
+		self.assertIsNone(self.page_of(older.name))
+
+		backfill_project_pages_if_enabled()  # auto-creation off: respected
+		self.assertIsNone(self.page_of(older.name))
+
+		frappe.db.set_single_value("Folio Settings", "auto_create_project_pages", 1)
+		frappe.clear_document_cache("Folio Settings", "Folio Settings")
+		patch.execute()  # what an existing install runs on its next migrate
+		self.assertIsNotNone(self.page_of(older.name))
+		patch.execute()  # idempotent
+		self.assertEqual(frappe.db.count("Folio Page", {"project": older.name, "is_project_page": 1}), 1)
+

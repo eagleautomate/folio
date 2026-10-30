@@ -14,6 +14,7 @@ def before_install():
 def after_install():
 	create_roles()
 	ensure_settings()
+	backfill_project_pages_if_enabled()
 
 
 def after_migrate():
@@ -33,3 +34,12 @@ def create_roles():
 			frappe.get_doc({"doctype": "Role", "role_name": role, "desk_access": 1}).insert(
 				ignore_permissions=True
 			)
+
+
+def backfill_project_pages_if_enabled():
+	"""Projects that existed before Folio get their pages too (unless auto-creation is off)."""
+	if not frappe.db.get_single_value("Folio Settings", "auto_create_project_pages"):
+		return
+	from folio.projects import backfill_project_pages
+
+	backfill_project_pages()

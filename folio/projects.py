@@ -136,10 +136,18 @@ def on_project_trash(project, method=None):
 def create_missing_project_pages() -> dict:
 	"""Backfill: a page for every existing Project that doesn't have one (Folio Manager only)."""
 	frappe.only_for(["System Manager", "Folio Manager"])
+	return {"created": backfill_project_pages()}
+
+
+def backfill_project_pages() -> int:
+	"""Create pages for Projects that don't have one. Used on install and by a one-off patch,
+	so projects that existed before Folio show up without anyone pressing a button."""
+	if "erpnext" not in frappe.get_installed_apps() or not frappe.db.exists("DocType", "Project"):
+		return 0
 	have = set(frappe.get_all("Folio Page", filters={"is_project_page": 1}, pluck="project"))
 	created = 0
 	for name in frappe.get_all("Project", order_by="creation asc", pluck="name"):
 		if name not in have:
 			create_project_page(name)
 			created += 1
-	return {"created": created}
+	return created

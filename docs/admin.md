@@ -15,6 +15,25 @@ Requires Frappe v16 (on Frappe Cloud: a v16 bench group). ERPNext is optional; t
 project and task features switch on when it's installed. People open Folio at
 `https://<site>/folio`; it also appears on the `/apps` screen.
 
+Projects that already exist when you install Folio get their pages right away, in a
+**Projects** space (unless "Create a page for every new Project" is turned off).
+
+## Don't see your projects?
+
+Check these, in order:
+
+1. **Update Folio.** Versions before 2026-10-30 only made pages for projects created
+   *after* installing Folio. Updating (on Frappe Cloud: deploy the latest version of the
+   app; elsewhere `bench update` or `git pull` + `bench --site <site> migrate`) runs a
+   one-off migration that creates the missing pages.
+2. **Your roles.** Seeing projects needs *Projects User* or *Projects Manager* in
+   ERPNext. *System Manager* alone isn't enough: ERPNext doesn't give it project access.
+   Without it, the **Projects** link in the sidebar doesn't appear.
+3. **User Permissions.** If you have a User Permission on *Project*, you only see those
+   projects.
+4. **Folio Settings.** If "Create a page for every new Project" is off, use
+   **Create pages for existing projects** there.
+
 ## Who can use Folio
 
 | Need | Give the user |

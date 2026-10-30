@@ -37,8 +37,9 @@
 
       <span class="min-w-0 flex-1 truncate">{{ pageTitle(page) }}</span>
 
-      <div class="hidden items-center group-hover:flex" @click.stop>
-        <Dropdown :options="menu" align="start">
+      <!-- stays visible while the menu is open: the menu is anchored to this button -->
+      <div class="items-center" :class="menuOpen ? 'flex' : 'hidden group-hover:flex'" @click.stop>
+        <Dropdown v-model:open="menuOpen" :options="menu" align="start">
           <template #trigger>
             <button class="flex size-5 items-center justify-center rounded text-ink-gray-5 hover:bg-surface-gray-4" aria-label="Page actions">
               <LucideMoreHorizontal class="size-3.5" />
@@ -70,7 +71,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Dropdown, toast } from 'frappe-ui'
 import {
@@ -98,6 +99,7 @@ const props = defineProps({
 })
 
 const route = useRoute()
+const menuOpen = ref(false)
 const router = useRouter()
 
 const children = computed(() => childrenOf(props.page.space, props.page.name))

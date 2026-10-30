@@ -6,3 +6,4 @@
 # Patches added in this section will be executed after doctypes are migrated
 folio.patches.v0_1.project_page_layout
 folio.patches.v0_1.subpages_inherit_project
+folio.patches.v0_1.backfill_project_pages

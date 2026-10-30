@@ -93,7 +93,7 @@ itself lets every Projects User see every project unless a User Permission limit
 ### A page for every project
 
 - **Every ERPNext Project gets a Folio page automatically**, in the **Projects**
-  space. Renaming the project renames the page (unless you gave the page your own
+  space, including projects that existed before Folio was installed. Renaming the project renames the page (unless you gave the page your own
   title). Deleting the project moves its page to the trash.
 - **Folio Settings** (`/desk/folio-settings`): turn automatic project pages on or
   off, choose the space they live in, and create pages for existing projects with
@@ -118,6 +118,8 @@ itself lets every Projects User see every project unless a User Permission limit
 
 ### Projects overview
 
+- **Projects** in the sidebar's top section opens the overview, for everyone who can
+  see projects in ERPNext.
 - **Sidebar** shows only active projects under Projects; completed and cancelled ones
   move to a "N completed" link (the page you have open always stays visible).
 - **All projects** (top of the Projects space in the sidebar, or `/folio/projects`):

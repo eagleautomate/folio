@@ -24,6 +24,15 @@
       <SidebarLink label="Home" :active="$route.name === 'Home'" @click="$router.push({ name: 'Home' })">
         <template #icon><LucideHome class="size-4" /></template>
       </SidebarLink>
+      <!-- always reachable, even before any project page exists -->
+      <SidebarLink
+        v-if="state.boot?.can_read_projects"
+        label="Projects"
+        :active="$route.name === 'Projects'"
+        @click="$router.push({ name: 'Projects' })"
+      >
+        <template #icon><LucideFolderKanban class="size-4" /></template>
+      </SidebarLink>
       <SidebarLink label="Trash" @click="trashOpen = true">
         <template #icon><LucideTrash2 class="size-4" /></template>
       </SidebarLink>
@@ -62,10 +71,17 @@
               :class="{ '-rotate-90': collapsed[space.name] }"
             />
           </button>
-          <Dropdown :options="spaceMenu(space)" align="start">
+          <!-- buttons stay visible while the menu is open: the menu is anchored to them -->
+          <Dropdown
+            :open="openSpaceMenu === space.name"
+            :options="spaceMenu(space)"
+            align="start"
+            @update:open="(v) => (openSpaceMenu = v ? space.name : null)"
+          >
             <template #trigger>
               <button
-                class="hidden size-5 items-center justify-center rounded hover:bg-surface-gray-4 group-hover:flex"
+                class="size-5 items-center justify-center rounded hover:bg-surface-gray-4"
+                :class="openSpaceMenu === space.name ? 'flex' : 'hidden group-hover:flex'"
                 :aria-label="`${space.title} options`"
               >
                 <LucideMoreHorizontal class="size-3.5" />
@@ -74,7 +90,8 @@
           </Dropdown>
           <button
             v-if="canEditSpace(space.name)"
-            class="hidden size-5 items-center justify-center rounded hover:bg-surface-gray-4 group-hover:flex"
+            class="size-5 items-center justify-center rounded hover:bg-surface-gray-4"
+            :class="openSpaceMenu === space.name ? 'flex' : 'hidden group-hover:flex'"
             aria-label="New page in this space"
             @click="newPage(space.name)"
           >
@@ -147,6 +164,7 @@ const spaceOpen = ref(false)
 const dropOnSpace = ref(null)
 const collapsed = reactive(loadCollapsed())
 const settings = reactive({ open: false, space: null, tab: 'General' })
+const openSpaceMenu = ref(null)
 
 function openSettings(space, tab = 'General') {
   Object.assign(settings, { open: true, space: space.name, tab })

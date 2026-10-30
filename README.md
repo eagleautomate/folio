@@ -166,6 +166,13 @@ Permissions as in the example. The [admin guide](docs/admin.md) walks through it
 
 ---
 
+## Learning Folio
+
+New people don't start from a blank screen. Folio comes with a **Getting Started**
+space: a welcome page with a 5-minute tour, guides on writing, organising, projects
+and permissions, and templates for meeting notes, project briefs and weekly plans.
+Open a template, choose **••• → Copy to…** and pick your space.
+
 ## Everything Folio does
 
 The short version (the full list is in [docs/features.md](docs/features.md)):

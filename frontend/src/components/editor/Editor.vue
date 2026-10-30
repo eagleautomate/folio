@@ -52,7 +52,9 @@ const editor = useEditor({
     handlePaste: (view, event) => handleFiles(event.clipboardData?.files),
     handleDrop: (view, event, slice, moved) => !moved && handleFiles(event.dataTransfer?.files),
   },
-  onUpdate: ({ editor }) => emit('update', editor.getJSON()),
+  // read-only editors still get structural transactions (e.g. tables fixing column
+  // widths on load); those must never turn into saves
+  onUpdate: ({ editor }) => editor.isEditable && emit('update', editor.getJSON()),
 })
 
 watch(

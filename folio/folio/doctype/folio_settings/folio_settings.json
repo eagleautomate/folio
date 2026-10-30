@@ -7,7 +7,10 @@
   "section_projects",
   "auto_create_project_pages",
   "projects_space",
-  "create_missing_project_pages"
+  "create_missing_project_pages",
+  "section_starter",
+  "starter_pages_created",
+  "add_starter_pages"
  ],
  "fields": [
   {
@@ -32,11 +35,30 @@
    "fieldname": "create_missing_project_pages",
    "fieldtype": "Button",
    "label": "Create pages for existing projects"
+  },
+  {
+   "fieldname": "section_starter",
+   "fieldtype": "Section Break",
+   "label": "Getting Started pages"
+  },
+  {
+   "default": "0",
+   "description": "Set once Folio has created the Getting Started space. If it was deleted, it isn't recreated on its own.",
+   "fieldname": "starter_pages_created",
+   "fieldtype": "Check",
+   "label": "Getting Started pages created",
+   "read_only": 1
+  },
+  {
+   "description": "Creates the Getting Started space again, or adds any of its pages that are missing.",
+   "fieldname": "add_starter_pages",
+   "fieldtype": "Button",
+   "label": "Add Getting Started pages"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2026-10-29 16:00:00.000000",
+ "modified": "2026-10-30 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Folio",
  "name": "Folio Settings",

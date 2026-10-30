@@ -7,6 +7,16 @@ user-visible change updates it (see AGENTS.md). Planned work lives in
 Open Folio at `/folio` on your site. Any desk user can use it; website users and
 guests can't.
 
+## Getting started
+
+- A **Getting Started** space comes with Folio: *Welcome to Folio*, *Writing pages*,
+  *Organising your work*, *Projects & tasks* (with ERPNext), *Who sees what*, and
+  *Templates* (Meeting notes, Project brief, Weekly plan).
+- Everyone can read it; Folio Managers can edit it or delete it. It is added once per
+  site; Folio Settings → **Add Getting Started pages** brings it (or missing pages) back.
+- **Copy to…** (a page's ••• menu, top right or in the sidebar) copies any page you can
+  read, with its sub-pages, into a space you can edit. That's how templates are used.
+
 ## Workspace and navigation
 
 - **Spaces** group pages, like Notion teamspaces. A space is either visible to
@@ -51,7 +61,7 @@ guests can't.
   version too, so it can be undone.
 - **Page menu**: full width, lock page (read-only for everyone until unlocked),
   version history, copy link, open in Desk, move to trash.
-- **Duplicate** a page with all its sub-pages.
+- **Duplicate** a page with all its sub-pages, or **Copy to…** another space.
 - **Read-only** view for people with *Can View* access, and for locked or trashed pages.
 
 ## Editor

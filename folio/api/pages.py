@@ -241,25 +241,52 @@ def move_page(name: str, space: str, parent_page: str | None = None, index: int 
 
 
 @frappe.whitelist(methods=["POST"])
-def duplicate_page(name: str) -> dict:
+def duplicate_page(name: str, space: str | None = None) -> dict:
+	"""Copy a page and its sub-pages.
+
+	Without ``space``: a "(copy)" right below the original (needs edit on its space).
+	With ``space``: "Copy to…", e.g. a template from a read-only space into your own; needs
+	only view on the original and edit on the target. Sub-pages you can't see aren't copied.
+	"""
 	check_page_access(name, "view")
 	src = frappe.get_doc("Folio Page", name)
-	check_space_access(src.space, "edit")
+	target = space or src.space
+	check_space_access(target, "edit")
+	same_space = target == src.space
 
 	def copy(source, parent_page, title):
 		new = frappe.copy_doc(source)
 		# a copy is never the project's page (there is exactly one per project)
-		new.update({"parent_page": parent_page, "title": title, "is_locked": 0, "content_version": 0, "is_project_page": 0})
+		new.update(
+			{
+				"space": target,
+				"parent_page": parent_page,
+				"title": title,
+				"is_locked": 0,
+				"content_version": 0,
+				"is_project_page": 0,
+			}
+		)
 		new.insert(ignore_permissions=True)
 		for child in frappe.get_all(
-			"Folio Page", filters={"parent_page": source.name, "is_archived": 0}, pluck="name"
+			"Folio Page",
+			filters={"parent_page": source.name, "is_archived": 0},
+			fields=["name", "space", "project"],
+			order_by="sort_order asc",
 		):
-			child_doc = frappe.get_doc("Folio Page", child)
-			copy(child_doc, new.name, child_doc.title)
+			if filter_visible_pages([child]):
+				child_doc = frappe.get_doc("Folio Page", child.name)
+				copy(child_doc, new.name, child_doc.title)
 		return new
 
-	new = copy(src, src.parent_page, _("{0} (copy)").format(src.title or _("Untitled")))
-	new.db_set("sort_order", (src.sort_order or 0) + 0.5, update_modified=False)
+	if same_space:
+		new = copy(src, src.parent_page, _("{0} (copy)").format(src.title or _("Untitled")))
+		new.db_set("sort_order", (src.sort_order or 0) + 0.5, update_modified=False)
+	else:
+		new = copy(src, None, src.title)
+		new.db_set(
+			"sort_order", next_sort_order("Folio Page", {"space": target, "parent_page": ("is", "not set")}), update_modified=False
+		)
 	return {f: new.get(f) for f in PAGE_FIELDS}
 
 

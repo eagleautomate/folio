@@ -136,6 +136,8 @@ import {
   patchPage,
   createPage,
   archivePage,
+  duplicatePage,
+  canEditSpace,
   toggleFavorite,
   expandAncestors,
   loadWorkspace,
@@ -201,6 +203,17 @@ const statusText = computed(() => {
   return `Edited ${timeAgo(doc.value.last_edited_on)}`
 })
 
+// "Copy to…": any space you can add pages to except this page's own (e.g. a template
+// from the read-only Getting Started space into your team's space)
+const copyTargets = computed(() => state.spaces.filter((s) => s.name !== doc.value?.space && canEditSpace(s.name)))
+
+async function copyTo(space) {
+  await flushSave()
+  const copy = await duplicatePage(props.name, space.name)
+  toast.success(`Copied to ${space.title}`)
+  router.push({ name: 'Page', params: { name: copy.name } })
+}
+
 const pageMenu = computed(() => {
   if (!doc.value) return []
   const d = doc.value
@@ -221,6 +234,15 @@ const pageMenu = computed(() => {
           onClick: () => setMeta({ is_locked: d.is_locked ? 0 : 1 }),
         },
         { label: 'Version history', icon: 'lucide-history', onClick: () => (historyOpen.value = true) },
+        {
+          label: 'Copy to…',
+          icon: 'lucide-copy-plus',
+          condition: () => copyTargets.value.length > 0,
+          submenu: copyTargets.value.map((space) => ({
+            label: `${space.icon ? space.icon + ' ' : ''}${space.title}`,
+            onClick: () => copyTo(space),
+          })),
+        },
         {
           label: 'Copy link',
           icon: 'lucide-link',
@@ -261,6 +283,7 @@ const pageMenu = computed(() => {
 const scheduleSave = debounce(() => save(), 700)
 
 function onContentUpdate(json) {
+  if (!doc.value?.can_edit) return // read-only: nothing to save
   pendingContent = json
   saveState.value = 'dirty'
   scheduleSave()

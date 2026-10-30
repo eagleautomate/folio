@@ -15,6 +15,7 @@ def after_install():
 	create_roles()
 	ensure_settings()
 	backfill_project_pages_if_enabled()
+	create_starter_pages()
 
 
 def after_migrate():
@@ -43,3 +44,10 @@ def backfill_project_pages_if_enabled():
 	from folio.projects import backfill_project_pages
 
 	backfill_project_pages()
+
+
+def create_starter_pages():
+	"""The Getting Started space (once per site; see folio/starter.py)."""
+	from folio.starter import create_starter_pages as create
+
+	create()

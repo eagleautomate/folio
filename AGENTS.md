@@ -28,6 +28,7 @@ folio/                           Python package (the Frappe app)
   hooks.py                       routes, install hooks, permission hooks, Project doc_events
   permissions.py                 ALL access rules: spaces + ERPNext Project cap, desk hooks
   projects.py                    Project doc_events: auto project pages, rename, trash, backfill
+  starter.py                     Getting Started space: guide + template pages (once per site)
   content.py                     ProseMirror JSON builders (page templates, demo, tests)
   utils.py                       ProseMirror JSON -> text, snippets, sort helpers
   install.py                     roles "Folio Manager" / "Folio User", Folio Settings defaults
@@ -94,6 +95,7 @@ cd apps/folio/frontend && node e2e/sidebar.mjs e2e/shots        # finished proje
 cd apps/folio/frontend && node e2e/spaces.mjs e2e/shots         # space settings dialog
 cd apps/folio/frontend && node e2e/access.mjs e2e/shots         # project pages follow ERPNext permissions (real users)
 cd apps/folio/frontend && node e2e/menus.mjs e2e/shots          # sidebar ⋯ menus open next to their row
+cd apps/folio/frontend && node e2e/starter.mjs e2e/shots        # Getting Started pages + Copy to…
 cd apps/folio/frontend && yarn lint                             # ESLint (Vue + JS)
 cd apps/folio/frontend && node e2e/screenshots.mjs ../docs/screenshots  # refresh README screenshots (cleans up after itself)
 
@@ -191,6 +193,12 @@ its subtree to the trash; deleting is only allowed from the trash.
 - A menu's trigger must stay rendered while the menu is open (`v-model:open` on
   frappe-ui `Dropdown`). Hover-only (`hidden group-hover:flex`) triggers vanish when the
   pointer moves to the menu, and the menu jumps to the top-left corner.
+- TipTap fires `onUpdate` for read-only editors too (structural transactions); the
+  Editor only emits updates while editable and Page.vue never saves without `can_edit`.
+- Sidebar rows and the page header both have `button[aria-label="Page actions"]`;
+  scope selectors (`main header …`).
+- Starter page text lives in `folio/starter.py`; changing it only affects sites that
+  don't have those pages yet (or after Folio Settings → Add Getting Started pages).
 - After a refused change, re-render bound `<select>`s (`:key` on a version counter):
   Vue doesn't repaint a select whose bound value didn't change.
 - HTML5 drag and drop: dispatch `DragEvent`s with a shared `DataTransfer`

@@ -111,6 +111,9 @@ const canEdit = computed(() => (props.page.access ? ['edit', 'full'].includes(pr
 const isFavorite = computed(() => state.favorites.includes(props.page.name))
 const dropHere = computed(() => (drag.over === props.page.name ? drag.position : null))
 
+// spaces you can add pages to, other than this page's own (Duplicate covers that)
+const copyTargets = computed(() => state.spaces.filter((s) => s.name !== props.page.space && canEditSpace(s.name)))
+
 const menu = computed(() => [
   {
     label: isFavorite.value ? 'Remove from favorites' : 'Add to favorites',
@@ -124,6 +127,18 @@ const menu = computed(() => [
       const copy = await duplicatePage(props.page.name)
       router.push({ name: 'Page', params: { name: copy.name } })
     },
+  },
+  copyTargets.value.length && {
+    label: 'Copy to…',
+    icon: 'lucide-copy-plus',
+    submenu: copyTargets.value.map((space) => ({
+      label: `${space.icon ? space.icon + ' ' : ''}${space.title}`,
+      onClick: async () => {
+        const copy = await duplicatePage(props.page.name, space.name)
+        toast.success(`Copied to ${space.title}`)
+        router.push({ name: 'Page', params: { name: copy.name } })
+      },
+    })),
   },
   {
     label: 'Copy link',

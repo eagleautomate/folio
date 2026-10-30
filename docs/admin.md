@@ -18,6 +18,11 @@ project and task features switch on when it's installed. People open Folio at
 Projects that already exist when you install Folio get their pages right away, in a
 **Projects** space (unless "Create a page for every new Project" is turned off).
 
+Folio also adds a **Getting Started** space with guides and templates, at the top of the
+sidebar. Everyone can read it; Folio Managers can edit it, or delete it once the team
+doesn't need it (it won't come back on its own). To restore it, or pages someone
+deleted, use **Folio Settings → Add Getting Started pages**.
+
 ## Don't see your projects?
 
 Check these, in order:

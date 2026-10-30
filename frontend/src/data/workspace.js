@@ -103,8 +103,9 @@ export async function archivePage(name) {
   await loadWorkspace()
 }
 
-export async function duplicatePage(name) {
-  const page = await call('folio.api.pages.duplicate_page', { name })
+// without `space`: a copy right below; with `space`: "Copy to…" another space
+export async function duplicatePage(name, space = null) {
+  const page = await call('folio.api.pages.duplicate_page', { name, space })
   await loadWorkspace()
   return page
 }

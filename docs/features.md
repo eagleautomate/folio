@@ -33,7 +33,7 @@ guests can't.
 - **Home**: greeting, recently edited pages as cards, quick "New page" per space.
 - **Trash**: pages (with their sub-pages) go to the trash first; restore them, or
   delete them forever from there.
-- **Favorites**: star a page from its header or the sidebar menu.
+- **Favorites**: star a page from its header (the star turns gold) or the sidebar menu.
 - **New space** dialog with icon and visibility.
 - **Space settings** (the ⋯ menu on a space in the sidebar):
   - *General*: icon, name, description, who can see it (everyone / only members),

@@ -18,13 +18,17 @@
       </nav>
 
       <span class="hidden shrink-0 text-sm text-ink-gray-5 sm:block">{{ statusText }}</span>
+      <!-- a real <svg> (not icon="lucide-star", which is a CSS mask) so it can be filled -->
       <Button
         variant="ghost"
-        icon="lucide-star"
-        :class="{ 'text-amber-500 [&_svg]:fill-amber-400': isFavorite }"
         :aria-label="isFavorite ? 'Remove from favorites' : 'Add to favorites'"
+        :aria-pressed="isFavorite"
         @click="onToggleFavorite"
-      />
+      >
+        <template #icon>
+          <LucideStar class="size-4" :class="isFavorite ? 'fill-amber-500 text-amber-600' : 'text-ink-gray-6'" />
+        </template>
+      </Button>
       <Dropdown :options="pageMenu" align="end">
         <template #trigger="{ open }">
           <Button variant="ghost" icon="lucide-more-horizontal" :active="open" aria-label="Page actions" />

@@ -81,6 +81,8 @@
   content: attr(data-placeholder);
 }
 .folio-drag-handle { @apply transition-opacity; }
+/* touch: blocks can't be dragged with a finger here, and the handle would cover the text */
+@media (hover: none) { .folio-drag-handle { display: none !important; } }
 .ProseMirror-gapcursor::after { border-top-color: var(--ink-gray-8); }
 .folio-prose ::selection { @apply bg-blue-200/60; }
 

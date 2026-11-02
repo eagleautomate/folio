@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="group relative flex h-7 cursor-pointer items-center gap-1 rounded pr-1 text-base text-ink-gray-7 hover:bg-surface-gray-2"
+      class="group relative flex h-7 cursor-pointer touch:h-9 items-center gap-1 rounded pr-1 text-base text-ink-gray-7 hover:bg-surface-gray-2"
       :class="{
         '!bg-surface-gray-3 font-medium text-ink-gray-9': isActive,
         'opacity-40': drag.page === page.name,
@@ -20,25 +20,30 @@
       <div v-if="dropHere === 'after'" class="pointer-events-none absolute inset-x-1 bottom-0 h-0.5 rounded bg-blue-500" />
 
       <button
-        class="flex size-5 shrink-0 items-center justify-center rounded text-ink-gray-5 hover:bg-surface-gray-4"
+        class="flex size-5 shrink-0 items-center justify-center rounded text-ink-gray-5 hover:bg-surface-gray-4 touch:size-7"
         :aria-label="expanded ? 'Collapse' : 'Expand'"
         @click.stop="setExpanded(page.name, !expanded)"
       >
         <!-- page icon by default, expand chevron on hover (like Notion) -->
-        <span class="group-hover:hidden">
+        <span class="group-hover:hidden touch:!hidden">
           <span v-if="page.icon" class="text-sm leading-none">{{ page.icon }}</span>
           <LucideFileText v-else class="size-4" :class="{ 'text-ink-gray-7': hasKids }" />
         </span>
         <LucideChevronRight
-          class="hidden size-3.5 transition-transform group-hover:block"
+          class="hidden size-3.5 transition-transform group-hover:block touch:!block"
           :class="{ 'rotate-90': expanded }"
         />
       </button>
 
+      <!-- touch: no hover to swap icon and chevron, so show both -->
+      <span class="hidden shrink-0 touch:inline">
+        <span v-if="page.icon" class="text-sm leading-none">{{ page.icon }}</span>
+        <LucideFileText v-else class="size-4 text-ink-gray-5" />
+      </span>
       <span class="min-w-0 flex-1 truncate">{{ pageTitle(page) }}</span>
 
       <!-- stays visible while the menu is open: the menu is anchored to this button -->
-      <div class="items-center" :class="menuOpen ? 'flex' : 'hidden group-hover:flex'" @click.stop>
+      <div class="items-center" :class="menuOpen ? 'flex' : 'hidden group-hover:flex touch:flex'" @click.stop>
         <Dropdown v-model:open="menuOpen" :options="menu" align="start">
           <template #trigger>
             <button class="flex size-5 items-center justify-center rounded text-ink-gray-5 hover:bg-surface-gray-4" aria-label="Page actions">
@@ -61,7 +66,7 @@
       <PageTreeItem v-for="child in children" :key="child.name" :page="child" :depth="depth + 1" />
       <div
         v-if="!children.length"
-        class="flex h-7 items-center text-sm text-ink-gray-4"
+        class="flex h-7 items-center text-sm text-ink-gray-4 touch:h-9"
         :style="{ paddingLeft: `${(depth + 1) * 14 + 28}px` }"
       >
         No pages inside

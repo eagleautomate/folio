@@ -2,14 +2,15 @@
   <div class="flex h-full flex-col">
     <!-- top bar -->
     <header class="flex h-11 shrink-0 items-center gap-2 px-3">
+      <SidebarToggle />
       <nav class="flex min-w-0 flex-1 items-center gap-0.5 text-base text-ink-gray-6">
         <template v-for="(crumb, i) in breadcrumbs" :key="crumb.name">
-          <span v-if="i" class="text-ink-gray-4">/</span>
+          <span v-if="i" class="text-ink-gray-4 max-sm:hidden">/</span>
           <component
             :is="crumb.space ? 'span' : 'router-link'"
             :to="crumb.space ? undefined : { name: 'Page', params: { name: crumb.name } }"
             class="flex min-w-0 items-center gap-1 truncate rounded px-1.5 py-0.5"
-            :class="crumb.space ? 'text-ink-gray-5' : 'hover:bg-surface-gray-2'"
+            :class="[crumb.space ? 'text-ink-gray-5' : 'hover:bg-surface-gray-2', { 'max-sm:hidden': i < breadcrumbs.length - 1 }]"
           >
             <span v-if="crumb.icon" class="text-sm">{{ crumb.icon }}</span>
             <span class="truncate">{{ crumb.title || 'Untitled' }}</span>
@@ -62,22 +63,22 @@
 
       <!-- cover -->
       <div v-if="doc.cover" class="group relative h-[28vh] max-h-72 min-h-36 w-full" :style="coverStyle">
-        <div v-if="doc.can_edit" class="absolute bottom-3 right-4 hidden gap-1 group-hover:flex">
+        <div v-if="doc.can_edit" class="absolute bottom-3 right-4 hidden gap-1 group-hover:flex touch:flex">
           <Button size="sm" label="Change cover" @click="cycleCover" />
           <Button size="sm" label="Remove" @click="setMeta({ cover: null })" />
         </div>
       </div>
 
-      <div class="mx-auto px-6 sm:px-12" :class="wide ? 'max-w-none' : 'max-w-[720px]'">
+      <div class="mx-auto px-5 sm:px-12" :class="wide ? 'max-w-none' : 'max-w-[720px]'">
         <!-- icon + title -->
-        <div class="group relative" :class="doc.cover ? (doc.icon ? '-mt-10' : 'pt-8') : 'pt-16'">
+        <div class="group relative" :class="doc.cover ? (doc.icon ? '-mt-10' : 'pt-8') : 'pt-8 sm:pt-16'">
           <EmojiPicker v-if="doc.icon" v-model="doc.icon" removable @select="(e) => setMeta({ icon: e })">
             <button class="mb-2 block rounded text-[64px] leading-none hover:bg-surface-gray-2" :disabled="!doc.can_edit">
               {{ doc.icon }}
             </button>
           </EmojiPicker>
 
-          <div v-if="doc.can_edit" class="flex h-7 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          <div v-if="doc.can_edit" class="flex h-7 gap-1 opacity-0 transition-opacity group-hover:opacity-100 touch:opacity-100">
             <EmojiPicker v-if="!doc.icon" @select="(e) => setMeta({ icon: e })">
               <button class="flex items-center gap-1 rounded px-1.5 py-1 text-sm text-ink-gray-5 hover:bg-surface-gray-2">
                 <LucideSmile class="size-4" /> Add icon
@@ -96,7 +97,7 @@
             ref="titleInput"
             v-model="title"
             rows="1"
-            class="mt-1 w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-[2.5rem] font-bold leading-tight text-ink-gray-9 placeholder-ink-gray-3 focus:ring-0"
+            class="mt-1 w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-[2rem] font-bold leading-tight sm:text-[2.5rem] text-ink-gray-9 placeholder-ink-gray-3 focus:ring-0"
             placeholder="Untitled"
             :readonly="!doc.can_edit"
             @input="onTitleInput"
@@ -135,6 +136,8 @@ import Editor from '@/components/editor/Editor.vue'
 import ProjectPage from '@/components/project/ProjectPage.vue'
 import EmojiPicker from '@/components/EmojiPicker.vue'
 import VersionHistory from '@/components/VersionHistory.vue'
+import SidebarToggle from '@/components/SidebarToggle.vue'
+import { sidebarVisible } from '@/composables/layout'
 import {
   state,
   patchPage,
@@ -408,18 +411,21 @@ function onBeforeUnload(e) {
 let clock
 onMounted(() => {
   window.addEventListener('beforeunload', onBeforeUnload)
+  window.addEventListener('resize', autosizeTitle)
   clock = setInterval(() => (now.value = Date.now()), 30000)
 })
 onBeforeUnmount(() => {
   window.removeEventListener('beforeunload', onBeforeUnload)
+  window.removeEventListener('resize', autosizeTitle)
   clearInterval(clock)
 })
 // leaving to another route, or to another page (same route, new params)
 onBeforeRouteLeave(flushSave)
 onBeforeRouteUpdate(flushSave)
 
+// the title wraps differently when the window or the sidebar changes width
 watch(
-  () => doc.value?.title,
+  [() => doc.value?.title, sidebarVisible],
   () => nextTick(autosizeTitle),
 )
 </script>

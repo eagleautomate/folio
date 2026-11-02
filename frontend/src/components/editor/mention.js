@@ -2,13 +2,14 @@
 import Mention from '@tiptap/extension-mention'
 import { call } from 'frappe-ui'
 import CommandList from './CommandList.vue'
-import { vueSuggestionRenderer } from './suggestionRenderer'
+import { suggestionFloatingUi, vueSuggestionRenderer } from './suggestionRenderer'
 
 export const UserMention = Mention.configure({
   HTMLAttributes: { class: 'folio-mention' },
   renderText: ({ node }) => `@${node.attrs.label ?? node.attrs.id}`,
   suggestion: {
     char: '@',
+    floatingUi: suggestionFloatingUi,
     items: async ({ query }) => {
       const users = await call('folio.api.workspace.get_users', { query, limit: 8 })
       return users.map((u) => ({

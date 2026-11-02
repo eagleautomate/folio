@@ -200,6 +200,16 @@ try {
   await pilot.waitForFunction(() => /isn't available/.test(document.body.innerText))
   await shot(pilot, '15-limited-user-blocked')
   created.admin = admin
+
+  // 8. on a phone: the project page, and the sidebar as a slide-in menu
+  const phone = await session('anna.keller@folio.test', 'admin12345!')
+  await collapseWiki(phone, wiki)
+  await phone.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 })
+  await (await phone.createCDPSession()).send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 })
+  await go(phone, `/folio/p/${projectPage}`, 'main header')
+  await shot(phone, '16-phone-page')
+  await phone.tap('button[aria-label="Open menu"]')
+  await shot(phone, '17-phone-menu')
 } finally {
   const admin = created.admin || (await session('Administrator', 'admin'))
   // users first: their User Permission on the project would block deleting it

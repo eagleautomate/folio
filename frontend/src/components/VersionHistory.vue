@@ -1,8 +1,8 @@
 <template>
   <Dialog v-model="open" :options="{ size: '5xl' }">
     <template #body>
-      <div class="flex h-[75vh]">
-        <div class="min-w-0 flex-1 overflow-y-auto px-10 py-8">
+      <div class="flex h-[75vh] max-md:flex-col">
+        <div class="min-w-0 flex-1 overflow-y-auto px-5 py-6 md:px-10 md:py-8">
           <LoadingIndicator v-if="version.loading" class="mx-auto size-5 text-ink-gray-5" />
           <template v-else-if="version.data">
             <h1 class="mb-4 text-3xl font-bold text-ink-gray-9">{{ version.data.title || 'Untitled' }}</h1>
@@ -10,7 +10,7 @@
           </template>
           <p v-else class="mt-20 text-center text-base text-ink-gray-5">Select a version to preview it</p>
         </div>
-        <aside class="flex w-64 shrink-0 flex-col border-l border-outline-gray-1 bg-surface-gray-1">
+        <aside class="flex w-64 shrink-0 flex-col border-l border-outline-gray-1 bg-surface-gray-1 max-md:h-60 max-md:w-full max-md:border-l-0 max-md:border-t">
           <div class="px-4 pb-2 pt-4 text-base font-semibold text-ink-gray-8">Version history</div>
           <div class="flex-1 overflow-y-auto px-2">
             <div v-if="!versions.data?.length && !versions.loading" class="px-2 text-sm text-ink-gray-5">

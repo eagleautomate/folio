@@ -26,6 +26,13 @@ guests can't.
   non-members. Folio Managers and System Managers can open every space.
 - **Sidebar** with favorites, every space, and nested pages. Spaces and pages
   can be collapsed and remember that.
+- **Hide the sidebar** for more room to write: the panel button at the top of the
+  sidebar, or **⌘\\** (Ctrl+\\ on Windows/Linux). The button at the top-left brings it
+  back. Folio remembers the choice in that browser.
+- **Phones and tablets**: below 768px the sidebar becomes a menu that slides in (☰ at
+  the top-left) and closes when you open a page or tap outside it. Page actions
+  (⋯ and +) are always visible on touch screens, rows are bigger to tap, tables and
+  boards scroll sideways inside their box, and the task panel fills the screen.
 - **Drag and drop pages** in the sidebar: before, after or inside another page, or
   onto a space.
 - **Search (⌘K)** across titles and page text, including task titles in pages.

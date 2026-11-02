@@ -110,6 +110,19 @@ allowed to see, titles and text.
 
 ![Search](docs/screenshots/12-search.png)
 
+### On the way home
+
+Jonas checks the portal plan on his phone. The sidebar folds away into a menu (☰), so
+the page gets the whole screen. He opens the menu, taps a page, and the menu gets out
+of the way. At his desk, he hides the sidebar with **⌘\\** when he wants more room to
+write.
+
+<p>
+  <img src="docs/screenshots/16-phone-page.png" alt="A project page on a phone" width="260" />
+  &nbsp;
+  <img src="docs/screenshots/17-phone-menu.png" alt="The sidebar as a menu on a phone" width="260" />
+</p>
+
 ---
 
 ## Who sees what
@@ -221,8 +234,10 @@ normal install. Don't run the demo on a site with real data.
 
 ## Known limitations
 
-- **Best on desktop.** The mobile layout isn't done yet (it's on the
-  [roadmap](docs/roadmap.md), Phase 1), so Folio works best in a desktop browser.
+- **Drag and drop needs a mouse.** On a phone or tablet you can read, write and manage
+  tasks, but moving pages around the sidebar and dragging cards on a board only work
+  with a mouse for now. On a phone, change a task's status from its task panel instead.
+  It's on the [roadmap](docs/roadmap.md).
 
 ## Learn more
 

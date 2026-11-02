@@ -47,6 +47,7 @@ folio/                           Python package (the Frappe app)
                                  test_project_access (ERPNext permission cap)
 frontend/                        Vue 3 + frappe-ui + TipTap SPA (Vite), eslint.config.js
   src/router.js                  /, /p/:name (page), /projects (overview)
+  src/composables/               layout.js (sidebar collapsed / mobile drawer), search.js, dragTree.js
   src/data/                      workspace.js (sidebar store), tasks.js (task cache + edits),
                                  project.js (useProject: live project for a project page)
   src/pages/                     Home, Page (autosave, conflicts, project wrapper), Projects (overview)
@@ -96,6 +97,7 @@ cd apps/folio/frontend && node e2e/spaces.mjs e2e/shots         # space settings
 cd apps/folio/frontend && node e2e/access.mjs e2e/shots         # project pages follow ERPNext permissions (real users)
 cd apps/folio/frontend && node e2e/menus.mjs e2e/shots          # sidebar ⋯ menus open next to their row
 cd apps/folio/frontend && node e2e/starter.mjs e2e/shots        # Getting Started pages + Copy to…
+cd apps/folio/frontend && node e2e/mobile.mjs e2e/shots         # collapsible sidebar (desktop) + phone layout (drawer, touch, overflow)
 cd apps/folio/frontend && yarn lint                             # ESLint (Vue + JS)
 cd apps/folio/frontend && node e2e/screenshots.mjs ../docs/screenshots  # refresh README screenshots (cleans up after itself)
 
@@ -177,6 +179,15 @@ its subtree to the trash; deleting is only allowed from the trash.
   focus must move immediately (see `Editor.vue`).
 - The `@tiptap/extension-drag-handle` peer-requires Yjs packages; they are installed
   on purpose (needed for collaboration later).
+- **Touch**: anything shown only on hover (`hidden group-hover:flex`, `opacity-0
+  group-hover:opacity-100`) also needs `touch:flex` / `touch:opacity-100` (the `touch:`
+  variant = `@media (hover: none)`, defined in `tailwind.config.js`). Below `md` the
+  sidebar is a drawer: a new sidebar action that opens a dialog must call `openDialog()`
+  so the drawer closes first.
+- Tables keep a `min-w-[…]` big enough for their name column (fixed columns + ~250px);
+  the box scrolls sideways, the page must not (`e2e/mobile.mjs` checks this).
+- TipTap suggestion popups (slash, @mention) need `floatingUi: suggestionFloatingUi`
+  (`shift()`), or they run off the right edge of a phone.
 
 ## Writing browser tests
 
@@ -190,6 +201,12 @@ its subtree to the trash; deleting is only allowed from the trash.
 - A second user in the same test needs its own `browser.createBrowserContext()`;
   a new page shares cookies, so `/login` redirects into the Desk as the first user.
 - Wait for confirmation dialogs to finish closing before clicking what's under them.
+- Leaving a page with unsaved edits triggers the browser's "leave site?" prompt, which
+  hangs `page.goto`. Wait for the header to stop saying "Saving…" before navigating away.
+- Phone tests: `setViewport({ isMobile, hasTouch })` plus CDP
+  `Emulation.setTouchEmulationEnabled` makes `(hover: none)` match. Check that something is
+  *on top* with `document.elementFromPoint` at a point the covering layer would hit, and
+  look at the screenshots: a menu behind the drawer still has a bounding box.
 - A menu's trigger must stay rendered while the menu is open (`v-model:open` on
   frappe-ui `Dropdown`). Hover-only (`hidden group-hover:flex`) triggers vanish when the
   pointer moves to the menu, and the menu jumps to the top-left corner.

@@ -2,6 +2,16 @@
 
 Short records of choices that someone might otherwise undo. Newest first.
 
+## 2026-11-02 — Sidebar: collapsible column on desktop, drawer below 768px
+
+One layout store (`composables/layout.js`) decides: `md` and up, the sidebar is a column
+that can be collapsed (remembered in localStorage); below, it's a drawer over the page
+that closes on navigation. Touch is detected with `@media (hover: none)` (Tailwind
+variant `touch:`), not screen width, because hover-only controls are a touch problem
+and an iPad is wide. Dialogs opened from the drawer close it first (frappe-ui dialogs
+are `z-10`, below the drawer), and reka-ui popups are lifted to `z-index: 100` so menus
+opened inside the drawer or the task panel are never covered.
+
 ## 2026-10-29 — Project pages follow Frappe's Project permission
 
 A page linked to a Project (and its sub-pages) is visible only to people who can read

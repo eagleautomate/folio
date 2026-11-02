@@ -1,6 +1,6 @@
 <template>
   <div class="h-full overflow-y-auto">
-    <div class="mx-auto max-w-[1400px] px-6 pb-16 pt-10 sm:px-12">
+    <div class="mx-auto max-w-[1400px] px-5 pb-16 pt-12 sm:px-12 sm:pt-10">
       <div class="flex flex-wrap items-end gap-3">
         <div class="mr-auto">
           <h1 class="flex items-center gap-2 text-3xl font-bold text-ink-gray-9">📁 Projects</h1>
@@ -34,9 +34,9 @@
           <option value="completed">Completed &amp; cancelled</option>
           <option value="all">All projects</option>
         </select>
-        <div class="relative">
+        <div class="relative max-sm:order-last max-sm:w-full">
           <LucideSearch class="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-ink-gray-4" />
-          <input v-model="query" class="h-7 w-52 rounded border-0 bg-surface-gray-2 pl-7 pr-2 text-sm placeholder-ink-gray-4 focus:ring-0" placeholder="Search projects" />
+          <input v-model="query" class="h-7 w-52 rounded border-0 max-sm:w-full bg-surface-gray-2 pl-7 pr-2 text-sm placeholder-ink-gray-4 focus:ring-0" placeholder="Search projects" />
         </div>
         <Button size="sm" :variant="mine ? 'subtle' : 'ghost'" icon-left="lucide-user" label="My projects" @click="setQuery({ mine: mine ? undefined : '1' })" />
         <span class="ml-auto text-xs text-ink-gray-5">{{ projects.length }} project{{ projects.length === 1 ? '' : 's' }}</span>
@@ -50,7 +50,7 @@
 
       <!-- table -->
       <div v-else-if="view === 'table'" class="mt-4 overflow-x-auto rounded-lg border border-outline-gray-1">
-        <table class="w-full min-w-[900px] table-fixed text-left text-sm">
+        <table class="w-full min-w-[1060px] table-fixed text-left text-sm">
           <colgroup>
             <col />
             <col class="w-28" />

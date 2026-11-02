@@ -20,7 +20,8 @@ Each step ships on its own and is verified (tests + build + browser check) befor
 - [x] Space settings dialog: general (icon, name, description, visibility, default access, ERPNext project), members (add / change / remove), delete
 - [ ] Per-page share with specific users (beyond space membership)
 - [ ] Comments on pages (Frappe `Comment`) and notifications for @mentions
-- [ ] Mobile layout (collapsible sidebar)
+- [x] Collapsible sidebar (⌘\\) and mobile layout (sidebar drawer, touch-friendly controls)
+- [ ] Touch drag and drop (moving pages in the sidebar, cards on the board): today these need a mouse
 - [ ] Dark mode toggle (tokens already theme-aware)
 
 ## Phase 2 — Databases

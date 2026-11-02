@@ -1,6 +1,6 @@
 <template>
   <div class="h-full overflow-y-auto">
-    <div class="mx-auto max-w-4xl px-6 pb-16 pt-16 sm:px-12">
+    <div class="mx-auto max-w-4xl px-5 pb-16 pt-14 sm:px-12 sm:pt-16">
       <h1 class="text-3xl font-bold text-ink-gray-9">{{ greeting }}, {{ firstName }}</h1>
       <p class="mt-1 text-base text-ink-gray-5">Pick up where you left off, or start something new.</p>
 
@@ -44,7 +44,7 @@
               <Button variant="solid" icon-left="lucide-plus" label="New page" />
             </template>
           </Dropdown>
-          <Button variant="subtle" icon-left="lucide-search" label="Search  ⌘K" @click="search.open = true" />
+          <Button variant="subtle" icon-left="lucide-search" :label="layout.mobile ? 'Search' : 'Search  ⌘K'" @click="search.open = true" />
         </div>
       </section>
     </div>
@@ -57,6 +57,7 @@ import { useRouter } from 'vue-router'
 import { Button, Dropdown, createResource } from 'frappe-ui'
 import { state, createPage, canEditSpace } from '@/data/workspace'
 import { search } from '@/composables/search'
+import { layout } from '@/composables/layout'
 import { pageTitle, timeAgo } from '@/utils'
 
 const router = useRouter()

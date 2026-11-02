@@ -1,2 +1,20 @@
 @import 'frappe-ui/style.css';
 @import './components/editor/editor.css';
+
+/* iOS Safari zooms the page into any field with text under 16px and doesn't zoom back.
+   Only iOS matches this @supports, so desktop and Android keep the design sizes. */
+@supports (-webkit-touch-callout: none) {
+  input,
+  textarea,
+  select,
+  [contenteditable='true'] {
+    font-size: max(16px, 1em);
+  }
+}
+
+/* Menus, selects and tooltips (reka-ui poppers) take the z-index of their content, and
+   frappe-ui's Dropdown sets none, so the mobile drawer (z-40) and the task panel would
+   cover them. Same layer as frappe-ui's Popover. */
+[data-reka-popper-content-wrapper] {
+  z-index: 100 !important;
+}

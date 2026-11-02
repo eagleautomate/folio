@@ -1,4 +1,5 @@
 import frappeUIPreset from 'frappe-ui/tailwind'
+import plugin from 'tailwindcss/plugin'
 
 export default {
   presets: [frappeUIPreset],
@@ -9,5 +10,6 @@ export default {
     './node_modules/frappe-ui/frappe/**/*.{vue,js,ts}',
   ],
   theme: { extend: {} },
-  plugins: [],
+  // touch: devices without hover (phones, tablets) — reveal hover-only controls, bigger targets
+  plugins: [plugin(({ addVariant }) => addVariant('touch', '@media (hover: none)'))],
 }

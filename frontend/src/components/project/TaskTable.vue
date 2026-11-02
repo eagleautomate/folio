@@ -1,6 +1,6 @@
 <template>
   <div class="overflow-x-auto rounded-lg border border-outline-gray-1">
-    <table class="w-full min-w-[720px] table-fixed text-left text-sm">
+    <table class="w-full min-w-[920px] table-fixed text-left text-sm">
       <colgroup>
         <col class="w-10" />
         <col />

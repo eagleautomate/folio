@@ -3,7 +3,7 @@ import { Extension } from '@tiptap/core'
 import Suggestion from '@tiptap/suggestion'
 import { PluginKey } from '@tiptap/pm/state'
 import CommandList from './CommandList.vue'
-import { vueSuggestionRenderer } from './suggestionRenderer'
+import { suggestionFloatingUi, vueSuggestionRenderer } from './suggestionRenderer'
 
 import IconText from '~icons/lucide/type'
 import IconH1 from '~icons/lucide/heading-1'
@@ -197,6 +197,7 @@ export const SlashCommands = Extension.create({
         pluginKey: new PluginKey('slashCommands'),
         editor: this.editor,
         char: '/',
+        floatingUi: suggestionFloatingUi,
         allowSpaces: false,
         startOfLine: false,
         allow: ({ state, range }) => {

@@ -18,7 +18,6 @@ def get_context(context):
 	if not is_folio_user():
 		frappe.throw(_("Folio is only available to desk users"), frappe.PermissionError)
 
-	frappe.db.commit()
 	context.boot = get_boot()
 	return context
 

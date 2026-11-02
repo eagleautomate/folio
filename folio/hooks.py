@@ -5,7 +5,7 @@ app_description = "Notion-style workspace for pages, docs and project plans, bui
 app_email = "mn@eagleautomation.in"
 app_license = "mit"
 
-required_apps = ["frappe"]
+required_apps = []  # frappe is implicit; ERPNext is optional (features switch on when installed)
 
 # Apps screen tile (/apps) and desk app switcher
 add_to_apps_screen = [

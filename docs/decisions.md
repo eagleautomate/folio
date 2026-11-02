@@ -41,7 +41,7 @@ not a column you can drop into.
 ## 2026-10-29 — ERPNext stays optional; ERPNext data obeys ERPNext permissions
 
 Folio installs on plain Frappe; ERPNext features switch on when ERPNext is present
-(`required_apps` stays `["frappe"]`). Anything that reads or writes ERPNext records
+(`required_apps` stays empty: frappe is implicit, and listing ERPNext would make it mandatory). Anything that reads or writes ERPNext records
 goes through ERPNext's permission checks as the session user, on top of Folio's page
 access. Page access alone never grants access to a Task.
 

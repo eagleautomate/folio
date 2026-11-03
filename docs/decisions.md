@@ -2,6 +2,17 @@
 
 Short records of choices that someone might otherwise undo. Newest first.
 
+## 2026-11-03 — Installable app without a service worker (for now)
+
+Folio is a PWA through `folio/public/manifest.json` plus Apple's meta tags in
+`frontend/index.html`. iOS doesn't need a service worker to add a site to the Home
+Screen, and Chrome reports Folio installable without one. A worker would only add
+offline use, which needs its own design (stale pages vs. autosave conflicts), and to
+control `/folio` it would have to be served from under `/folio`, not `/assets`. The
+manifest's `scope` is `/`, not `/folio`, so the login page stays inside the app
+instead of opening Safari. iOS has no install prompt, so Folio shows its own guide
+(`InstallSheet.vue`), only on touch screens and never when already installed.
+
 ## 2026-11-02 — Sidebar: collapsible column on desktop, drawer below 768px
 
 One layout store (`composables/layout.js`) decides: `md` and up, the sidebar is a column

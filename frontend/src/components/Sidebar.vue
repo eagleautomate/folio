@@ -166,6 +166,7 @@ import { state, childrenOf, createPage, movePage, canEditSpace, pagesByName } fr
 import { drag, resetDrag } from '@/composables/dragTree'
 import { search } from '@/composables/search'
 import { layout, toggleSidebar, closeDrawer } from '@/composables/layout'
+import { canInstall, device, install } from '@/composables/install'
 import { pageTitle } from '@/utils'
 
 const router = useRouter()
@@ -210,7 +211,8 @@ function finishedCount(space) {
 
 const favoritePages = computed(() => state.favorites.map((name) => pagesByName.value[name]).filter(Boolean))
 
-const userMenu = [
+const userMenu = computed(() => [
+  canInstall() && { label: device.ios || layout.mobile ? 'Add to Home Screen' : 'Install app', icon: 'lucide-smartphone', onClick: () => openDialog(() => (install.open = true)) },
   { label: 'Open Desk', icon: 'lucide-layout-grid', onClick: () => (window.location.href = '/desk') },
   { label: 'Apps', icon: 'lucide-grid-2x2', onClick: () => (window.location.href = '/apps') },
   {
@@ -218,10 +220,11 @@ const userMenu = [
     icon: 'lucide-log-out',
     onClick: async () => {
       await fetch('/api/method/logout', { method: 'POST', headers: { 'X-Frappe-CSRF-Token': window.csrf_token } })
-      window.location.href = '/login'
+      // back to Folio after signing in again (a home-screen app has no address bar)
+      window.location.href = '/login?redirect-to=/folio'
     },
   },
-]
+].filter(Boolean))
 
 function loadCollapsed() {
   try {

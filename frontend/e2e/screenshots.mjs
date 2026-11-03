@@ -11,8 +11,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 const shots = []
 const errors = []
 
-async function session(usr, pwd) {
+async function session(usr, pwd, ua) {
   const page = await (await browser.createBrowserContext()).newPage()
+  if (ua) await page.setUserAgent(ua)
   page.on('pageerror', (e) => errors.push(e.message))
   await page.goto(`${B}/login`)
   await page.evaluate(({ usr, pwd }) => fetch('/api/method/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usr, pwd }) }), { usr, pwd })
@@ -210,6 +211,14 @@ try {
   await shot(phone, '16-phone-page')
   await phone.tap('button[aria-label="Open menu"]')
   await shot(phone, '17-phone-menu')
+  // the "Add to Home Screen" guide, as an iPhone in Safari sees it
+  const iphone = await session('anna.keller@folio.test', 'admin12345!', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1')
+  await collapseWiki(iphone, wiki)
+  await iphone.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 })
+  await (await iphone.createCDPSession()).send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 })
+  await go(iphone, '/folio', 'main')
+  await iphone.waitForSelector('section[aria-label="Add Folio to your Home Screen"]')
+  await shot(iphone, '18-add-to-home-screen')
 } finally {
   const admin = created.admin || (await session('Administrator', 'admin'))
   // users first: their User Permission on the project would block deleting it

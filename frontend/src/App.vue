@@ -1,6 +1,6 @@
 <template>
   <FrappeUIProvider>
-    <div class="flex h-full w-full overflow-hidden bg-surface-base text-ink-gray-8">
+    <div class="folio-safe flex h-full w-full overflow-hidden bg-surface-base text-ink-gray-8">
       <!-- mobile: the sidebar is a drawer over the page -->
       <Transition enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0" leave-active-class="transition-opacity duration-150" leave-to-class="opacity-0">
         <div v-if="layout.mobile && layout.drawerOpen" class="fixed inset-0 z-30 bg-black/30" aria-hidden="true" @click="closeDrawer" />
@@ -15,7 +15,7 @@
         <Sidebar
           v-if="state.loaded"
           v-show="sidebarVisible()"
-          :class="layout.mobile ? 'fixed inset-y-0 left-0 z-40 !w-72 max-w-[85vw] shadow-2xl' : ''"
+          :class="layout.mobile ? 'folio-safe-drawer fixed inset-y-0 left-0 z-40 !w-72 max-w-[85vw] shadow-2xl' : ''"
         />
       </Transition>
       <main class="relative flex min-w-0 flex-1 flex-col">
@@ -29,6 +29,7 @@
         <router-view v-else :key="$route.params.name || $route.path" />
       </main>
       <SearchDialog />
+      <InstallSheet />
     </div>
   </FrappeUIProvider>
 </template>
@@ -40,6 +41,8 @@ import { FrappeUIProvider, LoadingIndicator } from 'frappe-ui'
 import Sidebar from '@/components/Sidebar.vue'
 import SearchDialog from '@/components/SearchDialog.vue'
 import SidebarToggle from '@/components/SidebarToggle.vue'
+import InstallSheet from '@/components/InstallSheet.vue'
+import { maybeShow as maybeShowInstall } from '@/composables/install'
 import { state, loadWorkspace } from '@/data/workspace'
 import { search } from '@/composables/search'
 import { layout, sidebarVisible, toggleSidebar, closeDrawer } from '@/composables/layout'
@@ -68,6 +71,8 @@ onMounted(async () => {
   window.addEventListener('keydown', onKeydown)
   try {
     await loadWorkspace()
+    // on a phone, offer "Add to Home Screen" once the workspace is on screen
+    setTimeout(maybeShowInstall, 1500)
   } catch (e) {
     error.value = e?.messages?.[0] || e?.message || 'Unknown error'
   }

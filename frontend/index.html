@@ -2,9 +2,18 @@
 <html class="h-full" lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover: as a home-screen app, Folio pads itself for the notch and home bar -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Folio</title>
     <link rel="icon" type="image/svg+xml" href="/assets/folio/images/folio-logo.svg" />
+    <!-- installable app (Add to Home Screen): manifest + what iOS reads instead of it -->
+    <link rel="manifest" href="/assets/folio/manifest.json" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Folio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="apple-touch-icon" href="/assets/folio/images/pwa/apple-touch-icon.png" />
   </head>
   <body class="h-full">
     <div id="app" class="h-full"></div>

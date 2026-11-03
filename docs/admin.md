@@ -15,6 +15,11 @@ Requires Frappe v16 (on Frappe Cloud: a v16 bench group). ERPNext is optional; t
 project and task features switch on when it's installed. People open Folio at
 `https://<site>/folio`; it also appears on the `/apps` screen.
 
+Folio can be **added to a phone's Home Screen** and then opens like an app. Nothing to
+set up; it needs the site on HTTPS (Frappe Cloud always is). On iPhone the app keeps its
+own login, separate from Safari, so people sign in once more the first time they open
+it from the Home Screen. Folio has no offline mode yet: the app needs a connection.
+
 Projects that already exist when you install Folio get their pages right away, in a
 **Projects** space (unless "Create a page for every new Project" is turned off).
 

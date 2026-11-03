@@ -33,6 +33,14 @@ guests can't.
   the top-left) and closes when you open a page or tap outside it. Page actions
   (⋯ and +) are always visible on touch screens, rows are bigger to tap, tables and
   boards scroll sideways inside their box, and the task panel fills the screen.
+- **Folio as an app on your phone** (Add to Home Screen): it opens full screen with its
+  own icon, like a native app. On an iPhone or iPad, Folio shows a short guide the
+  first time (Share → Add to Home Screen → Add), worded for Safari, Chrome and other
+  browsers; inside apps like Instagram or Gmail it says to open Safari, with a Copy
+  link button. On Android it offers a one-tap **Install**. "Not now" hides the guide for
+  two weeks; **Add to Home Screen** in the menu under your name opens it again. Once
+  installed, it never asks again. On a desktop, Chrome and Edge show **Install app** in
+  that menu.
 - **Drag and drop pages** in the sidebar: before, after or inside another page, or
   onto a space.
 - **Search (⌘K)** across titles and page text, including task titles in pages.

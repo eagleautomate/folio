@@ -117,10 +117,16 @@ the page gets the whole screen. He opens the menu, taps a page, and the menu get
 of the way. At his desk, he hides the sidebar with **⌘\\** when he wants more room to
 write.
 
+The first time he opened Folio on his iPhone, it showed him how to put it on his Home
+Screen: Share, *Add to Home Screen*, Add. Now Folio has its own icon and opens full
+screen, like any other app. Android phones get a one-tap *Install* button instead.
+
 <p>
   <img src="docs/screenshots/16-phone-page.png" alt="A project page on a phone" width="260" />
   &nbsp;
   <img src="docs/screenshots/17-phone-menu.png" alt="The sidebar as a menu on a phone" width="260" />
+  &nbsp;
+  <img src="docs/screenshots/18-add-to-home-screen.png" alt="The Add to Home Screen guide on an iPhone" width="260" />
 </p>
 
 ---

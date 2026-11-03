@@ -47,7 +47,8 @@ folio/                           Python package (the Frappe app)
                                  test_project_access (ERPNext permission cap)
 frontend/                        Vue 3 + frappe-ui + TipTap SPA (Vite), eslint.config.js
   src/router.js                  /, /p/:name (page), /projects (overview)
-  src/composables/               layout.js (sidebar collapsed / mobile drawer), search.js, dragTree.js
+  src/composables/               layout.js (sidebar collapsed / mobile drawer), install.js (Add to
+                                 Home Screen / install prompt), search.js, dragTree.js
   src/data/                      workspace.js (sidebar store), tasks.js (task cache + edits),
                                  project.js (useProject: live project for a project page)
   src/pages/                     Home, Page (autosave, conflicts, project wrapper), Projects (overview)
@@ -98,6 +99,8 @@ cd apps/folio/frontend && node e2e/access.mjs e2e/shots         # project pages 
 cd apps/folio/frontend && node e2e/menus.mjs e2e/shots          # sidebar ⋯ menus open next to their row
 cd apps/folio/frontend && node e2e/starter.mjs e2e/shots        # Getting Started pages + Copy to…
 cd apps/folio/frontend && node e2e/mobile.mjs e2e/shots         # collapsible sidebar (desktop) + phone layout (drawer, touch, overflow)
+cd apps/folio/frontend && node e2e/install.mjs e2e/shots        # PWA: manifest/installable + Add to Home Screen guide (iOS, in-app, Android)
+cd apps/folio/frontend && node scripts/pwa-icons.mjs            # re-render home-screen icons from folio/public/images/folio-icon.svg
 cd apps/folio/frontend && yarn lint                             # ESLint (Vue + JS)
 cd apps/folio/frontend && node e2e/screenshots.mjs ../docs/screenshots  # refresh README screenshots (cleans up after itself)
 
@@ -186,6 +189,14 @@ its subtree to the trash; deleting is only allowed from the trash.
   so the drawer closes first.
 - Tables keep a `min-w-[…]` big enough for their name column (fixed columns + ~250px);
   the box scrolls sideways, the page must not (`e2e/mobile.mjs` checks this).
+- **Home-screen app (PWA)**: `folio/public/manifest.json` + Apple tags in `index.html`.
+  With `viewport-fit=cover` the page runs under the notch and home bar: the app root has
+  `.folio-safe`; anything new that is `fixed` to an edge (drawers, sheets, panels) needs
+  safe-area padding too (`.folio-safe-drawer`, `.folio-safe-panel`, or
+  `env(safe-area-inset-*)`). An installed app has no address bar: never send people to a
+  URL they can't leave (e.g. logout uses `/login?redirect-to=/folio`).
+- Home-screen icons must be opaque, full-bleed squares (iOS rounds them and fills
+  transparency with black); regenerate them with `scripts/pwa-icons.mjs`.
 - TipTap suggestion popups (slash, @mention) need `floatingUi: suggestionFloatingUi`
   (`shift()`), or they run off the right edge of a phone.
 
@@ -203,6 +214,9 @@ its subtree to the trash; deleting is only allowed from the trash.
 - Wait for confirmation dialogs to finish closing before clicking what's under them.
 - Leaving a page with unsaved edits triggers the browser's "leave site?" prompt, which
   hangs `page.goto`. Wait for the header to stop saying "Saving…" before navigating away.
+- `browser.createBrowserContext()` pages are private windows: Chrome reports them
+  "in-incognito" (not installable) and never fires `beforeinstallprompt`. Installability
+  checks use `browser.newPage()`.
 - Phone tests: `setViewport({ isMobile, hasTouch })` plus CDP
   `Emulation.setTouchEmulationEnabled` makes `(hover: none)` match. Check that something is
   *on top* with `document.elementFromPoint` at a point the covering layer would hit, and

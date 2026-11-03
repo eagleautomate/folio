@@ -18,3 +18,15 @@
 [data-reka-popper-content-wrapper] {
   z-index: 100 !important;
 }
+
+/* Home-screen app (viewport-fit=cover): keep content clear of the notch, the rounded
+   corners and the home bar. env() is 0 everywhere else, so desktop is unchanged. */
+.folio-safe {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.folio-safe-drawer {
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.folio-safe-panel {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) 0;
+}

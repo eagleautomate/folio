@@ -16,7 +16,7 @@
     >
       <aside
         v-if="taskName"
-        class="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-outline-gray-2 bg-surface-base shadow-2xl"
+        class="folio-safe-panel fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-outline-gray-2 bg-surface-base shadow-2xl"
         role="dialog"
         aria-label="Task details"
         @keydown.esc="close"

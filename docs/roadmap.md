@@ -21,6 +21,8 @@ Each step ships on its own and is verified (tests + build + browser check) befor
 - [ ] Per-page share with specific users (beyond space membership)
 - [ ] Comments on pages (Frappe `Comment`) and notifications for @mentions
 - [x] Collapsible sidebar (⌘\\) and mobile layout (sidebar drawer, touch-friendly controls)
+- [x] Installable app (PWA): manifest, home-screen icons, iOS tags, safe areas, "Add to Home Screen" guide (iOS) and Install button (Android)
+- [ ] Offline: service worker to open recent pages without a connection
 - [ ] Touch drag and drop (moving pages in the sidebar, cards on the board): today these need a mouse
 - [ ] Dark mode toggle (tokens already theme-aware)
 

@@ -2,6 +2,20 @@
 
 Short records of choices that someone might otherwise undo. Newest first.
 
+## 2026-11-05 — Files are private Frappe Files on the page; inserts never replace a block
+
+The File block (`fileAttachment`) stores only the file's URL, name, size and type;
+the file itself goes through Frappe's `upload_file` as a private File attached to the
+Folio Page, so Frappe's own file permission check (can you read the page it's
+attached to?) decides who can download it, with nothing Folio-specific to get wrong.
+Only `/files/`, `/private/files/` and http(s) URLs are ever rendered as links
+(`safeFileUrl`), because pasted HTML could otherwise carry `javascript:` URLs. Known
+gap: a page copied with **Copy to…** keeps links to the original page's files, so
+someone who can open the copy but not the original can't download them.
+
+Files and images are inserted with `insertBlock`: clicking a card or image selects it
+(a NodeSelection), and a plain insert would replace the selected block.
+
 ## 2026-11-03 — Installable app without a service worker (for now)
 
 Folio is a PWA through `folio/public/manifest.json` plus Apple's meta tags in

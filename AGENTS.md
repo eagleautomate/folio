@@ -56,7 +56,7 @@ frontend/                        Vue 3 + frappe-ui + TipTap SPA (Vite), eslint.c
                                  TrashDialog, NewSpaceDialog, SpaceSettingsDialog, VersionHistory,
                                  EmojiPicker
   src/components/editor/         Editor, extensions.js (the schema), slash menu, formatting menu,
-                                 blocks: callout, pageLink, taskBlock, projectBlock (+ *View.vue),
+                                 blocks: callout, pageLink, taskBlock, projectBlock, fileBlock (+ *View.vue),
                                  TaskRow, mentions, editor.css
   src/components/project/        ProjectPage (tabs), ProjectHeader, ProjectTasks (List/Board/Table),
                                  TaskBoard, TaskCard, TaskTable, TaskCheck, TaskPanel, NewProjectDialog
@@ -100,6 +100,7 @@ cd apps/folio/frontend && node e2e/menus.mjs e2e/shots          # sidebar ⋯ me
 cd apps/folio/frontend && node e2e/starter.mjs e2e/shots        # Getting Started pages + Copy to…
 cd apps/folio/frontend && node e2e/mobile.mjs e2e/shots         # collapsible sidebar (desktop) + phone layout (drawer, touch, overflow)
 cd apps/folio/frontend && node e2e/install.mjs e2e/shots        # PWA: manifest/installable + Add to Home Screen guide (iOS, in-app, Android)
+cd apps/folio/frontend && node e2e/files.mjs e2e/shots          # File block: /file upload, PDF preview, drop, failed upload, file access
 cd apps/folio/frontend && node scripts/pwa-icons.mjs            # re-render home-screen icons from folio/public/images/folio-icon.svg
 cd apps/folio/frontend && yarn lint                             # ESLint (Vue + JS)
 cd apps/folio/frontend && node e2e/screenshots.mjs ../docs/screenshots  # refresh README screenshots (cleans up after itself)
@@ -197,6 +198,9 @@ its subtree to the trash; deleting is only allowed from the trash.
   URL they can't leave (e.g. logout uses `/login?redirect-to=/folio`).
 - Home-screen icons must be opaque, full-bleed squares (iOS rounds them and fills
   transparency with black); regenerate them with `scripts/pwa-icons.mjs`.
+- Inserting a block from code (uploads, async results): use `insertBlock()` from
+  `fileBlock.js`. A selected card or image is a NodeSelection, and a plain
+  `insertContent` replaces it.
 - TipTap suggestion popups (slash, @mention) need `floatingUi: suggestionFloatingUi`
   (`shift()`), or they run off the right edge of a phone.
 
@@ -232,6 +236,8 @@ its subtree to the trash; deleting is only allowed from the trash.
   don't have those pages yet (or after Folio Settings → Add Getting Started pages).
 - After a refused change, re-render bound `<select>`s (`:key` on a version counter):
   Vue doesn't repaint a select whose bound value didn't change.
+- Dropping files in a test: ProseMirror ignores a `drop` event without `clientX`/`clientY`
+  (it needs a position); build the `DataTransfer` in the page with `new File([...])`.
 - HTML5 drag and drop: dispatch `DragEvent`s with a shared `DataTransfer`
   (see `e2e/board.mjs`); headless Chrome doesn't synthesise them from mouse moves.
 - The Vite build does not catch undefined variables in `<script setup>` (a missing

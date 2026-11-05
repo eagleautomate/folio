@@ -18,12 +18,13 @@ import IconDivider from '~icons/lucide/minus'
 import IconCode from '~icons/lucide/code'
 import IconTable from '~icons/lucide/table'
 import IconImage from '~icons/lucide/image'
+import IconFile from '~icons/lucide/paperclip'
 import IconPage from '~icons/lucide/file-text'
 import IconTask from '~icons/lucide/circle-check-big'
 import IconProject from '~icons/lucide/folder-kanban'
 
 // `run(editor, range, ctx)` performs the insert; ctx carries page-level callbacks
-// (creating sub-pages, uploading images) supplied by Editor.vue.
+// (creating sub-pages, uploading images and files) supplied by Editor.vue.
 export const COMMANDS = [
   {
     group: 'Basic blocks',
@@ -160,6 +161,17 @@ export const COMMANDS = [
     run: (e, r, ctx) => {
       e.chain().focus().deleteRange(r).run()
       ctx?.pickImage?.()
+    },
+  },
+  {
+    group: 'Media',
+    title: 'File',
+    description: 'Upload a PDF or any document',
+    icon: IconFile,
+    keywords: ['pdf', 'document', 'attachment', 'attach', 'upload', 'doc', 'word', 'excel', 'spreadsheet'],
+    run: (e, r, ctx) => {
+      e.chain().focus().deleteRange(r).run()
+      ctx?.pickFile?.()
     },
   },
 ]

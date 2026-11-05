@@ -16,6 +16,7 @@ import { PageLink } from './pageLink'
 import { UserMention } from './mention'
 import { TaskBlock } from './taskBlock'
 import { ProjectBlock } from './projectBlock'
+import { FileBlock } from './fileBlock'
 
 const lowlight = createLowlight(common)
 
@@ -43,6 +44,7 @@ export function buildExtensions({ context = {} } = {}) {
     CodeBlockLowlight.configure({ lowlight, defaultLanguage: 'plaintext' }),
     Callout,
     PageLink,
+    FileBlock,
     UserMention,
     TaskBlock.configure({ context }),
     ProjectBlock.configure({ context }),

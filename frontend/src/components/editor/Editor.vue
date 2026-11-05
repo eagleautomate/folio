@@ -10,6 +10,7 @@
     </template>
     <EditorContent :editor="editor" />
     <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="onFilePicked" />
+    <input ref="docInput" type="file" multiple class="hidden" aria-label="Upload a file" @change="onDocPicked" />
   </div>
 </template>
 
@@ -19,6 +20,7 @@ import { useEditor, EditorContent } from '@tiptap/vue-3'
 import { DragHandle } from '@tiptap/extension-drag-handle-vue-3'
 import { toast } from 'frappe-ui'
 import { buildExtensions } from './extensions'
+import { insertBlock, insertUploadedFile } from './fileBlock'
 import FormattingMenu from './FormattingMenu.vue'
 import { uploadFile } from '@/utils/upload'
 import { state } from '@/data/workspace'
@@ -33,6 +35,7 @@ const props = defineProps({
 const emit = defineEmits(['update', 'create-sub-page'])
 
 const fileInput = ref(null)
+const docInput = ref(null)
 
 // Callbacks the slash menu can trigger; they need the page context.
 const context = {
@@ -41,6 +44,7 @@ const context = {
   erpnext: !!state.boot?.erpnext_installed,
   createSubPage: () => emit('create-sub-page'),
   pickImage: () => fileInput.value?.click(),
+  pickFile: () => docInput.value?.click(),
 }
 
 const editor = useEditor({
@@ -50,7 +54,13 @@ const editor = useEditor({
   editorProps: {
     attributes: { class: 'folio-prose focus:outline-none' },
     handlePaste: (view, event) => handleFiles(event.clipboardData?.files),
-    handleDrop: (view, event, slice, moved) => !moved && handleFiles(event.dataTransfer?.files),
+    handleDrop: (view, event, slice, moved) => {
+      if (moved || !event.dataTransfer?.files?.length) return false
+      // dropped files go where they were dropped
+      const at = view.posAtCoords({ left: event.clientX, top: event.clientY })
+      if (at) editor.value?.commands.setTextSelection(at.pos)
+      return handleFiles(event.dataTransfer.files)
+    },
   },
   // read-only editors still get structural transactions (e.g. tables fixing column
   // widths on load); those must never turn into saves
@@ -62,17 +72,31 @@ watch(
   (value) => editor.value?.setEditable(value),
 )
 
+// Pasted or dropped files: images show inline, anything else becomes a file card.
 function handleFiles(files) {
-  const images = Array.from(files || []).filter((f) => f.type.startsWith('image/'))
-  if (!images.length) return false
-  images.forEach(insertImage)
+  const all = Array.from(files || [])
+  if (!all.length || !props.editable) return false
+  all.forEach((f) => (f.type.startsWith('image/') ? insertImage(f) : insertDocument(f)))
   return true
+}
+
+async function insertDocument(file) {
+  try {
+    await insertUploadedFile(editor.value, file, (f) => uploadFile(f, { doctype: 'Folio Page', docname: props.pageName }))
+  } catch (e) {
+    toast.error(`${file.name}: ${e?.message || 'Upload failed'}`)
+  }
+}
+
+function onDocPicked(event) {
+  Array.from(event.target.files || []).forEach(insertDocument)
+  event.target.value = ''
 }
 
 async function insertImage(file) {
   try {
     const url = await uploadFile(file, { doctype: 'Folio Page', docname: props.pageName })
-    editor.value?.chain().focus().setImage({ src: url, alt: file.name }).run()
+    if (editor.value) insertBlock(editor.value, { type: 'image', attrs: { src: url, alt: file.name } })
   } catch (e) {
     toast.error(e?.message || 'Upload failed')
   }

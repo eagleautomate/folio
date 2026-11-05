@@ -51,6 +51,9 @@ def content_to_text(content) -> str:
 		elif node_type in ("pageLink", "erpnextTask"):
 			attrs = node.get("attrs") or {}
 			parts.append(attrs.get("title") or attrs.get("subject") or "")
+		elif node_type == "fileAttachment":
+			# its own line, so a file name is found by search like any other text
+			parts.append("\n" + ((node.get("attrs") or {}).get("name") or "") + "\n")
 		elif node_type == "hardBreak":
 			parts.append("\n")
 		for child in node.get("content") or []:

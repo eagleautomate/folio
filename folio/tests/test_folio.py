@@ -84,6 +84,8 @@ class TestContentText(IntegrationTestCase):
 			],
 		}
 		self.assertEqual(content_to_text(doc), "Plan\nAsk @Anna")
+		doc["content"].append({"type": "fileAttachment", "attrs": {"url": "/private/files/q3.pdf", "name": "Q3 report.pdf"}})
+		self.assertEqual(content_to_text(doc), "Plan\nAsk @Anna\nQ3 report.pdf")
 		self.assertEqual(content_to_text(None), "")
 		self.assertEqual(content_to_text("not json"), "")
 

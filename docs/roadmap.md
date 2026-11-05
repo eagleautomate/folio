@@ -13,7 +13,7 @@ Each step ships on its own and is verified (tests + build + browser check) befor
 - [x] Page API: create, save with conflict check, move, duplicate, archive/restore/delete, favorites, versions
 - [x] SPA shell: sidebar with spaces, nested page tree, favorites, home, trash, ⌘K search
 - [x] Sidebar drag & drop (before / inside / after, and onto a space)
-- [x] Editor: headings, lists, to-dos, quote, callout, divider, code (highlighted), table, image upload/paste, links, highlight
+- [x] Editor: headings, lists, to-dos, quote, callout, divider, code (highlighted), table, image upload/paste, file block (PDF preview, any document), links, highlight
 - [x] Slash menu, bubble formatting menu, block drag handle, @mention users, sub-page blocks
 - [x] Page icon (emoji), cover (gradients), full width, lock, version history + restore
 - [x] Demo data seeder + browser smoke test

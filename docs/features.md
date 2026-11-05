@@ -83,7 +83,7 @@ guests can't.
 
 - **Blocks**: text, headings 1–3, bulleted / numbered / to-do lists, quote, callout
   (with a changeable emoji), divider, code block with syntax highlighting, table
-  (resizable columns), image.
+  (resizable columns), image, file.
 - **Slash menu (`/`)** to insert any block; the best name match comes first.
 - **Markdown shortcuts**: `#` headings, `-` / `1.` lists, `[]` to-dos, `>` quote,
   ```` ``` ```` code, `---` divider, `**bold**`, `*italic*`, `` `code` ``.
@@ -95,6 +95,13 @@ guests can't.
   shows the sub-page's live title and icon.
 - **Images**: upload from the `/` menu, paste or drop them in. Stored as private
   files on the page.
+- **Files** (PDFs, Word, Excel, slides, zips, anything): `/file` and pick one or more,
+  or drop or paste them onto the page. Each shows as a card with its name, type and
+  size; click it to open, or use the download button. PDFs have a **Preview** button
+  that shows the document right in the page. A file follows the page's access: people
+  who can't open the page can't download the file either, even with the link. File
+  names are searchable. The size limit is Frappe's (25 MB unless your admin changed
+  it in System Settings).
 
 ## ERPNext projects and tasks (when ERPNext is installed)
 

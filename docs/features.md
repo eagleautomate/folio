@@ -84,6 +84,14 @@ guests can't.
 - **Blocks**: text, headings 1–3, bulleted / numbered / to-do lists, quote, callout
   (with a changeable emoji), divider, code block with syntax highlighting, table
   (resizable columns), image, file.
+- **Tables you can shape**: hover a cell and grips appear on its column's top edge and
+  its row's left edge. Click a grip for a menu (with search): insert left/right or
+  above/below, move, duplicate, clear contents, background colour, header row/column,
+  delete. **Drag a grip** to move the column or row; a blue line shows where it lands.
+  The button at the table's top-left corner opens the table menu: header row and
+  column, add row or column, clear, colour, and **Delete table**. Faint **+** bars
+  under and beside the table add a row or a column. On a phone, the grips follow the
+  cell you tap. ⌘Z undoes any of it.
 - **Slash menu (`/`)** to insert any block; the best name match comes first.
 - **Markdown shortcuts**: `#` headings, `-` / `1.` lists, `[]` to-dos, `>` quote,
   ```` ``` ```` code, `---` divider, `**bold**`, `*italic*`, `` `code` ``.

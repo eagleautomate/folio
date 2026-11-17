@@ -7,6 +7,7 @@
         </button>
       </DragHandle>
       <FormattingMenu :editor="editor" />
+      <TableControls :editor="editor" />
     </template>
     <EditorContent :editor="editor" />
     <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="onFilePicked" />
@@ -22,6 +23,7 @@ import { toast } from 'frappe-ui'
 import { buildExtensions } from './extensions'
 import { insertBlock, insertUploadedFile } from './fileBlock'
 import FormattingMenu from './FormattingMenu.vue'
+import TableControls from './TableControls.vue'
 import { uploadFile } from '@/utils/upload'
 import { state } from '@/data/workspace'
 

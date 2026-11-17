@@ -2,6 +2,16 @@
 
 Short records of choices that someone might otherwise undo. Newest first.
 
+## 2026-11-18 — Table handles live outside the table; cell colours are names
+
+`TableControls.vue` draws the row / column / corner handles as an overlay on the
+editor, measured from the hovered cell, instead of decorating cells: the table's
+HTML and saved JSON stay plain TipTap tables. Actions are prosemirror-tables
+commands (`table.js`), which find the table through the selection, so each action
+first puts the cursor in the table. Cell colours are stored as a name
+(`background: "blue"`) and drawn by `editor.css`, never as raw CSS from the document.
+Duplicating a row or column is refused on tables with merged cells (no clear shape).
+
 ## 2026-11-05 — Files are private Frappe Files on the page; inserts never replace a block
 
 The File block (`fileAttachment`) stores only the file's URL, name, size and type;

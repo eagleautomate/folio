@@ -17,6 +17,7 @@ import { UserMention } from './mention'
 import { TaskBlock } from './taskBlock'
 import { ProjectBlock } from './projectBlock'
 import { FileBlock } from './fileBlock'
+import { ColoredCell, ColoredHeader } from './table'
 
 const lowlight = createLowlight(common)
 
@@ -37,7 +38,10 @@ export function buildExtensions({ context = {} } = {}) {
     }),
     TaskList,
     TaskItem.configure({ nested: true }),
-    TableKit.configure({ table: { resizable: true } }),
+    // cells with a background colour (TableControls); TableKit's own cells are swapped out
+    TableKit.configure({ table: { resizable: true }, tableCell: false, tableHeader: false }),
+    ColoredCell,
+    ColoredHeader,
     Image.configure({ HTMLAttributes: { class: 'folio-image' } }),
     Highlight.configure({ multicolor: false }),
     Typography,

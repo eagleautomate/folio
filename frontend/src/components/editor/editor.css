@@ -59,6 +59,16 @@
 .folio-prose .selectedCell::after { @apply pointer-events-none absolute inset-0 bg-blue-500/10 content-['']; }
 .folio-prose .column-resize-handle { @apply pointer-events-none absolute -right-0.5 bottom-0 top-0 w-1 bg-blue-400; }
 .folio-prose .tableWrapper { @apply overflow-x-auto; }
+/* cell colours (table.js CELL_COLORS): stored as a name, drawn here */
+.folio-prose [data-background="gray"] { background-color: #f1f1ef; }
+.folio-prose [data-background="brown"] { background-color: #f4eeee; }
+.folio-prose [data-background="orange"] { background-color: #fbecdd; }
+.folio-prose [data-background="yellow"] { background-color: #fbf3db; }
+.folio-prose [data-background="green"] { background-color: #edf3ec; }
+.folio-prose [data-background="blue"] { background-color: #e7f3f8; }
+.folio-prose [data-background="purple"] { background-color: #f6f3f9; }
+.folio-prose [data-background="pink"] { background-color: #faf1f5; }
+.folio-prose [data-background="red"] { background-color: #fdebec; }
 .folio-prose.resize-cursor { cursor: col-resize; }
 
 .folio-prose img.folio-image { @apply my-2 max-w-full rounded-md; }
@@ -81,6 +91,8 @@
   content: attr(data-placeholder);
 }
 .folio-drag-handle { @apply transition-opacity; }
+/* over a table the corner button (TableControls) replaces the block handle */
+.folio-editor[data-table-hover] .folio-drag-handle { visibility: hidden; }
 /* touch: blocks can't be dragged with a finger here, and the handle would cover the text */
 @media (hover: none) { .folio-drag-handle { display: none !important; } }
 .ProseMirror-gapcursor::after { border-top-color: var(--ink-gray-8); }

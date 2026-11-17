@@ -57,6 +57,7 @@ frontend/                        Vue 3 + frappe-ui + TipTap SPA (Vite), eslint.c
                                  EmojiPicker
   src/components/editor/         Editor, extensions.js (the schema), slash menu, formatting menu,
                                  blocks: callout, pageLink, taskBlock, projectBlock, fileBlock (+ *View.vue),
+                                 table.js + TableControls/TableMenu (row/column/table handles),
                                  TaskRow, mentions, editor.css
   src/components/project/        ProjectPage (tabs), ProjectHeader, ProjectTasks (List/Board/Table),
                                  TaskBoard, TaskCard, TaskTable, TaskCheck, TaskPanel, NewProjectDialog
@@ -101,6 +102,7 @@ cd apps/folio/frontend && node e2e/starter.mjs e2e/shots        # Getting Starte
 cd apps/folio/frontend && node e2e/mobile.mjs e2e/shots         # collapsible sidebar (desktop) + phone layout (drawer, touch, overflow)
 cd apps/folio/frontend && node e2e/install.mjs e2e/shots        # PWA: manifest/installable + Add to Home Screen guide (iOS, in-app, Android)
 cd apps/folio/frontend && node e2e/files.mjs e2e/shots          # File block: /file upload, PDF preview, drop, failed upload, file access
+cd apps/folio/frontend && node e2e/tables.mjs e2e/shots         # table grips: menus, drag to move, + bars, colours, delete table, phone
 cd apps/folio/frontend && node scripts/pwa-icons.mjs            # re-render home-screen icons from folio/public/images/folio-icon.svg
 cd apps/folio/frontend && yarn lint                             # ESLint (Vue + JS)
 cd apps/folio/frontend && node e2e/screenshots.mjs ../docs/screenshots  # refresh README screenshots (cleans up after itself)
@@ -198,6 +200,11 @@ its subtree to the trash; deleting is only allowed from the trash.
   URL they can't leave (e.g. logout uses `/login?redirect-to=/folio`).
 - Home-screen icons must be opaque, full-bleed squares (iOS rounds them and fills
   transparency with black); regenerate them with `scripts/pwa-icons.mjs`.
+- prosemirror-tables commands (`moveTableRow`, `toggleHeader…`, …) find the table from
+  the **selection**, not the `pos` you pass: put the cursor in the table first
+  (`selectTable` in `table.js`), or they silently do nothing.
+- Editor overlays mounted next to `EditorContent` (TableControls) mount before the
+  editor's DOM is in the page: listen on `document` and check targets at event time.
 - Inserting a block from code (uploads, async results): use `insertBlock()` from
   `fileBlock.js`. A selected card or image is a NodeSelection, and a plain
   `insertContent` replaces it.
